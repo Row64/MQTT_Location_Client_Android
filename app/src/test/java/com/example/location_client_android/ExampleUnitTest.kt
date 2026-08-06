@@ -1,4 +1,4 @@
-package com.example.mqtt_client_v4
+package com.example.location_client_android
 
 import org.junit.Test
 

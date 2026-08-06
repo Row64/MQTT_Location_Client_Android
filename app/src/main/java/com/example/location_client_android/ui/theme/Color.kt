@@ -1,4 +1,4 @@
-package com.example.mqtt_client_v4.ui.theme
+package com.example.location_client_android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

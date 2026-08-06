@@ -22,5 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MQTT_Client_v4"
+rootProject.name = "Location_Client_Android"
 include(":app")
+ 

@@ -1,4 +1,4 @@
-package com.example.mqtt_client_v4.ui.theme
+package com.example.location_client_android.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun MQTT_Client_v4Theme(
+fun Location_Client_AndroidTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
