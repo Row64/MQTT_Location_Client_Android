@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
+    // Kotlin serialization plugin for type safe routes and navigation arguments
+    // https://developer.android.com/guide/navigation#kts
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -47,13 +51,21 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Dependencies for location
-    implementation("com.google.android.gms:play-services-location:21.4.0")
+    // Dependencies for app navigation
+    // https://developer.android.com/guide/navigation#kts
+    val nav_version = "2.9.8"
+    implementation("androidx.navigation:navigation-compose:$nav_version")                       // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-fragment:$nav_version")                      // Views/Fragments integration
+    implementation("androidx.navigation:navigation-ui:$nav_version")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")     // Feature module support for Fragments
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")            // Testing Navigation
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")                    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation("com.google.android.gms:play-services-location:21.4.0")                      // Dependencies for location
 
     // Needed for depreciated libraries
-    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")    // Used in LocationServiceForeground.kt
-    implementation("androidx.appcompat:appcompat:1.4.1")                            // Used in LocationActivity.kt
-    implementation("com.google.android.material:material:1.5.0")                    // Used in LocationActivity.kt
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt
+    implementation("androidx.appcompat:appcompat:1.4.1")                                        // Used in LocationActivity.kt
+    implementation("com.google.android.material:material:1.5.0")                                // Used in LocationActivity.kt
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
