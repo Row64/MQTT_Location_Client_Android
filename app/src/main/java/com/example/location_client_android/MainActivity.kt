@@ -118,7 +118,12 @@ fun BottomAppBarMain(context: Context) {
                             contentDescription = "Login",
                         )
                     }
-                    IconButton(onClick = { startActivity(context, Intent(context, LocationActivity::class.java), null) }) {
+                    IconButton(onClick = {
+                        startActivity(
+                            context,
+                            Intent(context, LocationActivity::class.java),
+                            null
+                        ) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.send_data),
                             tint = MaterialTheme.colorScheme.primary,
