@@ -65,11 +65,13 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     )
 
-                    BottomAppBarMain()
-//                    BtnLayout()
+
+                    BottomAppBarMain(this)
 
                     // For testing - automatically switch activities when app launches
-                    startActivity(locationIntent)
+//                    startActivity(locationIntent)
+
+
 
                 }
             }
@@ -95,7 +97,7 @@ fun Greeting(text: String, modifier: Modifier = Modifier) {
  * https://developer.android.com/develop/ui/compose/components/app-bars
  */
 @Composable
-fun BottomAppBarMain() {
+fun BottomAppBarMain(context: Context) {
     Scaffold(
         bottomBar = {
             BottomAppBar(
@@ -116,7 +118,7 @@ fun BottomAppBarMain() {
                             contentDescription = "Login",
                         )
                     }
-                    IconButton(onClick = { /* startActivity(context, location, null) */ }) {
+                    IconButton(onClick = { startActivity(context, Intent(context, LocationActivity::class.java), null) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.send_data),
                             tint = MaterialTheme.colorScheme.primary,
