@@ -4,36 +4,60 @@
 
 package com.example.location_client_android
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.compose.rememberNavController
 import com.example.location_client_android.ui.theme.Location_Client_AndroidTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        /**
+         * Intents for navigating between app Activities.
+         * Activities are declared here, but called using startActivity() when buttons
+         * are selected in the bottom app bar.
+         *
+         * If an activity also uses a service, you must start that service using
+         * startService().
+         *
+         * Helpful resources:
+         * https://developer.android.com/guide/components/intents-filters
+         * https://stackoverflow.com/questions/9937120/switching-between-activities-in-android
+         */
+        val locationIntent = Intent(this, LocationActivity::class.java)
+
+
+
         enableEdgeToEdge()
         setContent {
+
+            /**
+             * Create the nav controller
+             * https://developer.android.com/guide/navigation/navcontroller#kotlin
+             */
+            val navController = rememberNavController()
+
             Location_Client_AndroidTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
@@ -42,7 +66,10 @@ class MainActivity : ComponentActivity() {
                     )
 
                     BottomAppBarMain()
-                    BtnLayout()
+//                    BtnLayout()
+
+                    // For testing - automatically switch activities when app launches
+                    startActivity(locationIntent)
 
                 }
             }
@@ -82,25 +109,22 @@ fun BottomAppBarMain() {
                             contentDescription = "Home Button", // Essential for accessibility
                         )
                     }
-//                    IconButton(onClick = { /* do something */ }) {
-//                        Icon(
-//                            Icons.Filled.Edit,
-//                            contentDescription = "Localized description",
-//                        )
-//                    }
-//                    IconButton(onClick = { /* do something */ }) {
-//                        Icon(
-//                            Icons.Filled.Mic,
-//                            contentDescription = "Localized description",
-//                        )
-//                    }
-//                    IconButton(onClick = { /* do something */ }) {
-//                        Icon(
-//                            Icons.Filled.Image,
-//                            contentDescription = "Localized description",
-//                        )
-//                    }
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.login),
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = "Login",
+                        )
+                    }
+                    IconButton(onClick = { /* startActivity(context, location, null) */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.send_data),
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = "Share Location",
+                        )
+                    }
                 },
+                // This app doesn't need a floating action button
                 floatingActionButton = {
 //                    FloatingActionButton(
 //                        onClick = { /* do something */ },
@@ -112,7 +136,8 @@ fun BottomAppBarMain() {
                 }
             )
         },
-    ) { innerPadding ->
+    ) {
+        innerPadding ->
         Text(
             modifier = Modifier.padding(innerPadding),
             text = "Example of a scaffold with a bottom app bar."
@@ -146,33 +171,35 @@ fun ScrollContent(innerPadding: PaddingValues) {
 /**
  * Button layout (?)
  * https://github.com/android/snippets/blob/50755e81ab2871f73ecdb762292d17895a483bff/compose/snippets/src/main/java/com/example/compose/snippets/components/Button.kt#L58-L63
+ *
+ * THIS BUTTON IS NO LONGER NEEDED
  */
-@Composable
-fun BtnLayout() {
-    Column(
-        modifier = Modifier
-            .padding(48.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        btnToLocationScreen(onClick = {
-            // ...
-        })
-    }
-}
-
-
+//@Composable
+//fun BtnLayout() {
+//    Column(
+//        modifier = Modifier
+//            .padding(48.dp)
+//            .fillMaxSize(),
+//        verticalArrangement = Arrangement.spacedBy(24.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//    ) {
+//        btnToLocationScreen(onClick = {
+//            // ...
+//        })
+//    }
+//}
 
 
 /**
  * Takes the user to the Send Location screen.
  *
  * This specific implementation is for testing.
+ *
+ * THIS BUTTON IS NO LONGER NEEDED
  */
-@Composable
-fun btnToLocationScreen(onClick: () -> Unit) {
-    Button(onClick = { onClick() }) {
-        Text("To Location Screen")
-    }
-}
+//@Composable
+//fun btnToLocationScreen(onClick: () -> Unit) {
+//    Button(onClick = { onClick() }) {
+//        Text("To Location Screen")
+//    }
+//}

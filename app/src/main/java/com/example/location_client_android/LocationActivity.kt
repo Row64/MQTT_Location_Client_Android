@@ -6,6 +6,7 @@
 package com.example.location_client_android
 
 import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -30,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 private const val TAG = "MainActivity"
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
 
-class LocationActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class LocationActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var locationServiceForegroundBound = false
 
@@ -64,17 +65,7 @@ class LocationActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /**
-         * Jetpack Compose replaces XML, and is the recommended UI architecture!
-         *
-         * XML file located at: res/layout/activity_location.xml
-         * I had to create the layout/ folder. Delete this later
-         * when the Compose version is ready.
-         *
-         * Replace this XML with Compose. This XML is currently
-         * only included for the app proof-of-concept.
-         */
-        setContentView(R.layout.activity_location) //*************************************************************************************************
+        setContentView(R.layout.activity_location)
 
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
