@@ -72,7 +72,7 @@ class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.location_fragment, container, false)
+        return inflater.inflate(R.layout.layout_fragment_location, container, false)
     }
 
 

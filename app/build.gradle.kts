@@ -53,7 +53,7 @@ dependencies {
 
     // Fragments
     // https://developer.android.com/guide/fragments/create#kts
-//    implementation("androidx.fragment:fragment-ktx:1.9.0")
+    implementation("androidx.fragment:fragment-ktx:1.9.0")
 
     // Dependencies for app navigation
     // https://developer.android.com/guide/navigation#kts

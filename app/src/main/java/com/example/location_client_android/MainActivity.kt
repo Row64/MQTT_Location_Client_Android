@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,16 +27,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.fragment.app.add
 import androidx.navigation.compose.rememberNavController
 import com.example.location_client_android.ui.theme.Location_Client_AndroidTheme
+import androidx.fragment.app.commit
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Layout XML
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.layout_activity_main)
 
+        /**
+         * Establish fragment navigation
+         *
+         * https://developer.android.com/guide/navigation/design#xml
+         * https://medium.com/@zorbeytorunoglu/fragment-navigation-on-android-c45488184399
+         */
+        // https://developer.android.com/guide/navigation/navcontroller#views
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
+
+
+        // TEST - Switch fragments on startup
+//        if (savedInstanceState == null) {
+//            supportFragmentManager.commit {
+//                setReorderingAllowed(true)
+//                add<LocationFragment>(R.id.fragment_container_view)
+//            }
+//        }
 
         /**
          * Intents for navigating between app Activities.
@@ -49,7 +79,7 @@ class MainActivity : ComponentActivity() {
          * https://developer.android.com/guide/components/intents-filters
          * https://stackoverflow.com/questions/9937120/switching-between-activities-in-android
          */
-        val locationIntent = Intent(this, LocationActivity::class.java)
+//        val locationIntent = Intent(this, LocationActivity::class.java)
 
 
 
