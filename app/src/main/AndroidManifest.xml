@@ -31,11 +31,11 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".LocationActivity"
-            android:theme="@style/Theme.Location_Client_Android">
+<!--        <activity-->
+<!--            android:name=".LocationActivity"-->
+<!--            android:theme="@style/Theme.Location_Client_Android">-->
 
-        </activity>
+<!--        </activity>-->
 
 
 

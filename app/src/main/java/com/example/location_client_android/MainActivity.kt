@@ -33,6 +33,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Layout XML
+        setContentView(R.layout.activity_main)
+
+
         /**
          * Intents for navigating between app Activities.
          * Activities are declared here, but called using startActivity() when buttons
@@ -50,32 +54,36 @@ class MainActivity : ComponentActivity() {
 
 
         enableEdgeToEdge()
-        setContent {
+//        setContent {
+//
+//
+//            /**
+//             * Create the nav controller
+//             * https://developer.android.com/guide/navigation/navcontroller#kotlin
+//             */
+//            val navController = rememberNavController()
+//
+//            Location_Client_AndroidTheme {
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    Greeting(
+//                        text = "Row64 MQTT Client Signal Generator",
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+//
+//
+//                    BottomAppBarMain(this)
+//
+//                    // For testing - automatically switch activities when app launches
+////                    startActivity(locationIntent)
+//
+//
+//
+//                }
+//            }
+//
+//        }
 
-            /**
-             * Create the nav controller
-             * https://developer.android.com/guide/navigation/navcontroller#kotlin
-             */
-            val navController = rememberNavController()
 
-            Location_Client_AndroidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        text = "Row64 MQTT Client Signal Generator",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-
-
-                    BottomAppBarMain(this)
-
-                    // For testing - automatically switch activities when app launches
-//                    startActivity(locationIntent)
-
-
-
-                }
-            }
-        }
     }
 }
 
@@ -91,6 +99,7 @@ fun Greeting(text: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
+
 
 /**
  * Bottom App Bar
@@ -119,11 +128,15 @@ fun BottomAppBarMain(context: Context) {
                         )
                     }
                     IconButton(onClick = {
-                        startActivity(
-                            context,
-                            Intent(context, LocationActivity::class.java),
-                            null
-                        ) }) {
+//                        startActivity(
+//                            context,
+//                            Intent(context, LocationActivity::class.java),
+//                            null)
+
+                        // Switch fragment
+                        // ...
+
+                        }) {
                         Icon(
                             painter = painterResource(id = R.drawable.send_data),
                             tint = MaterialTheme.colorScheme.primary,

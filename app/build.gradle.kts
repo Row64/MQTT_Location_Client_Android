@@ -51,6 +51,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // Fragments
+    // https://developer.android.com/guide/fragments/create#kts
+//    implementation("androidx.fragment:fragment-ktx:1.9.0")
+
     // Dependencies for app navigation
     // https://developer.android.com/guide/navigation#kts
     val nav_version = "2.9.8"
