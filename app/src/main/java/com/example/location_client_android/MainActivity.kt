@@ -24,7 +24,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 
 // Fragment destinations
-
+// https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
+@Serializable
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,11 +58,12 @@ class MainActivity : AppCompatActivity() {
          * using the createGraph() method and add destinations.
          *
          * https://developer.android.com/guide/navigation/design#dsl-views
+         *
+         * https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
          */
 //        navController.graph = navController.createGraph(
 //            startDestination =
 //        )
-
 
 
 
