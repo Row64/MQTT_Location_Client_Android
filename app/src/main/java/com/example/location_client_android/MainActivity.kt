@@ -1,14 +1,7 @@
-/**
- * The MainActivity is the primary interface for the app.
- */
-
 package com.example.location_client_android
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -26,36 +19,72 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
-import androidx.fragment.app.add
-import androidx.navigation.compose.rememberNavController
-import com.example.location_client_android.ui.theme.Location_Client_AndroidTheme
-import androidx.fragment.app.commit
-import androidx.navigation.NavController
+import androidx.navigation.createGraph
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+
+// Fragment destinations
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Layout XML
-        setContentView(R.layout.layout_activity_main)
+        setContentView(R.layout.activity_main)
 
+        // -----------------------------------------------------------------------------------
         /**
-         * Establish fragment navigation
+         * Establish fragment navigation using Kotlin DSL.
          *
-         * https://developer.android.com/guide/navigation/design#xml
-         * https://medium.com/@zorbeytorunoglu/fragment-navigation-on-android-c45488184399
+         * First, create a reference to the NavHostFragment, then associate it to
+         * an instance of the NavController.
+         *
+         * The NavHostFragment is hosted in res/xml/activity_main.xml
+         * The id of the NavHostFragment is: nav_host_fragment
+         *
+         * https://developer.android.com/guide/navigation/navcontroller
          */
-        // https://developer.android.com/guide/navigation/navcontroller#views
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
+        // Create a reference to the NavHostFragment with ID nav_host_fragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
+        // Retrieve the NavController for the selected NavHostFragment
         val navController = navHostFragment.navController
 
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        /**
+         * Simultaneously create and add a navigation graph to the NavController
+         * using the createGraph() method and add destinations.
+         *
+         * https://developer.android.com/guide/navigation/design#dsl-views
+         */
+//        navController.graph = navController.createGraph(
+//            startDestination =
+//        )
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
+
+
+
+
+
+
+
+        // Create an action bar based on the NavController
+        // setupActionBarWithNavController(navController) THROWS EXCEPTION BEFORE GRAPH IS MADE
+
+        // -----------------------------------------------------------------------------------
+
+
+        // Layout XML
+        // setContentView(R.layout.layout_fragment_home)
+
+
+
+
+
+        // NAVIGATION BAR!!
+//        val appBarConfiguration = AppBarConfiguration(navController.graph)
+//        setupActionBarWithNavController(navController, appBarConfiguration)
 
 
 
