@@ -4,7 +4,8 @@ plugins {
 
     // Kotlin serialization plugin for type safe routes and navigation arguments
     // https://developer.android.com/guide/navigation#kts
-    kotlin("plugin.serialization") version "2.0.21"
+//    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.4.10"
 }
 
 android {
@@ -63,8 +64,12 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:$nav_version")
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")     // Feature module support for Fragments
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")            // Testing Navigation
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")                    // JSON serialization library, works with the Kotlin serialization plugin
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")                    // JSON serialization library, works with the Kotlin serialization plugin
     implementation("com.google.android.gms:play-services-location:21.4.0")                      // Dependencies for location
+
+//    implementation(libs.navigation.compose)
+//    implementation(libs.kotlinx.serialization.json)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Needed for depreciated libraries
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt

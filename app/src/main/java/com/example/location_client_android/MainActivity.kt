@@ -21,11 +21,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.fragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
-// Fragment destinations
+// Fragment destinations (type safe)
 // https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
+// https://developer.android.com/guide/navigation/design/type-safety
 @Serializable
+data object Home
+@Serializable
+data object Location
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +68,17 @@ class MainActivity : AppCompatActivity() {
          *
          * https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
          */
-//        navController.graph = navController.createGraph(
-//            startDestination =
-//        )
+
+        navController.graph = navController.createGraph(
+            startDestination = Home
+        ) {
+            fragment<HomeFragment, Home> {
+//                label = resources.getString(R.string.layout_fragment_home)
+            }
+            fragment<LocationFragment, Location> {
+//                label = resources.getString(R.string.layout_fragment_location)
+            }
+        }
 
 
 
