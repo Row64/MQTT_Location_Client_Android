@@ -26,9 +26,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-// Fragment destinations (type safe)
-// https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
-// https://developer.android.com/guide/navigation/design/type-safety
+/**
+ *  Fragment destinations (type safe)
+ *  https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
+ *  https://developer.android.com/guide/navigation/design/type-safety
+ */
 @Serializable
 data object Home
 @Serializable
@@ -38,7 +40,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        /**
+         * The main activity's layout hosts the navigation fragment
+         * and the navigation bar.
+         */
+        setContentView(R.layout.test_nav_bar)
 
         // -----------------------------------------------------------------------------------
         /**
@@ -68,26 +74,19 @@ class MainActivity : AppCompatActivity() {
          *
          * https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
          */
-
         navController.graph = navController.createGraph(
             startDestination = Home
         ) {
-            fragment<HomeFragment, Home> {
-//                label = resources.getString(R.string.layout_fragment_home)
-            }
-            fragment<LocationFragment, Location> {
-//                label = resources.getString(R.string.layout_fragment_location)
-            }
+            fragment<HomeFragment, Home> {}
+            fragment<LocationFragment, Location> {}
         }
 
 
 
 
 
-
-
         // Create an action bar based on the NavController
-        // setupActionBarWithNavController(navController) THROWS EXCEPTION BEFORE GRAPH IS MADE
+//         setupActionBarWithNavController(navController)
 
         // -----------------------------------------------------------------------------------
 
