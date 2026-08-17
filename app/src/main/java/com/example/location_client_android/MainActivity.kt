@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.fragment
-import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
@@ -44,7 +43,7 @@ class MainActivity : AppCompatActivity() {
          * The main activity's layout hosts the navigation fragment
          * and the navigation bar.
          */
-        setContentView(R.layout.test_nav_bar)
+        setContentView(R.layout.layout_activity_main)
 
         // -----------------------------------------------------------------------------------
         /**
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
          * First, create a reference to the NavHostFragment, then associate it to
          * an instance of the NavController.
          *
-         * The NavHostFragment is hosted in res/xml/activity_main.xml
+         * The NavHostFragment is hosted in res/xml/layout_activity_main.xml
          * The id of the NavHostFragment is: nav_host_fragment
          *
          * https://developer.android.com/guide/navigation/navcontroller

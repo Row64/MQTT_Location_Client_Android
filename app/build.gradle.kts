@@ -74,7 +74,7 @@ dependencies {
     // Needed for depreciated libraries
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt
     implementation("androidx.appcompat:appcompat:1.4.1")                                        // Used in LocationActivity.kt
-    implementation("com.google.android.material:material:1.5.0")                                // Used in LocationActivity.kt
+    implementation("com.google.android.material:material:1.14.0")                                // Used in LocationActivity.kt
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
