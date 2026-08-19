@@ -52,6 +52,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // TEST - trying to resolve crash on switching out of send location fragment
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
+
     // Fragments
     // https://developer.android.com/guide/fragments/create#kts
     implementation("androidx.fragment:fragment-ktx:1.9.0")
@@ -73,7 +76,7 @@ dependencies {
 
     // Needed for depreciated libraries
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt
-    implementation("androidx.appcompat:appcompat:1.4.1")                                        // Used in LocationActivity.kt
+    implementation("androidx.appcompat:appcompat:1.8.0")                                        // Used in LocationActivity.kt
     implementation("com.google.android.material:material:1.14.0")                                // Used in LocationActivity.kt
 
     testImplementation(libs.junit)

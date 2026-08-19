@@ -9,6 +9,10 @@
         android:name="com.example.location_client_android.HomeFragment"
         android:label="HomeFragment" />
     <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.location_client_android.LoginFragment"
+        android:label="LocationFragment" />
+    <fragment
         android:id="@+id/locationFragment"
         android:name="com.example.location_client_android.LocationFragment"
         android:label="LocationFragment" />
