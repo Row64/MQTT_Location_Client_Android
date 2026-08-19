@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.fragment
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
@@ -46,6 +48,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.layout_activity_main)
 
         // -----------------------------------------------------------------------------------
+        // FRAGMENT NAVIGATION ATTEMPT 2
+        // Uses dedicated nav graph XML
+
+
+
+        // -----------------------------------------------------------------------------------
+        // FRAGMENT NAVIGATION ATTEMPT 1
+        // Attempt uses dynamic nav graph with programmatic approach
+        // Couldn't get to work
+
         /**
          * Establish fragment navigation using Kotlin DSL.
          *
@@ -80,82 +92,13 @@ class MainActivity : AppCompatActivity() {
             fragment<LocationFragment, Location> {}
         }
 
-
-
-
-
         // Create an action bar based on the NavController
-//         setupActionBarWithNavController(navController)
+        // https://developer.android.com/guide/navigation/integrations/ui#bottom_navigation
+        findViewById<BottomNavigationView>(R.id.bottom_navigation)
+            .setupWithNavController(navController)
 
         // -----------------------------------------------------------------------------------
 
-
-        // Layout XML
-        // setContentView(R.layout.layout_fragment_home)
-
-
-
-
-
-        // NAVIGATION BAR!!
-//        val appBarConfiguration = AppBarConfiguration(navController.graph)
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-
-
-
-        // TEST - Switch fragments on startup
-//        if (savedInstanceState == null) {
-//            supportFragmentManager.commit {
-//                setReorderingAllowed(true)
-//                add<LocationFragment>(R.id.fragment_container_view)
-//            }
-//        }
-
-        /**
-         * Intents for navigating between app Activities.
-         * Activities are declared here, but called using startActivity() when buttons
-         * are selected in the bottom app bar.
-         *
-         * If an activity also uses a service, you must start that service using
-         * startService().
-         *
-         * Helpful resources:
-         * https://developer.android.com/guide/components/intents-filters
-         * https://stackoverflow.com/questions/9937120/switching-between-activities-in-android
-         */
-//        val locationIntent = Intent(this, LocationActivity::class.java)
-
-
-
-        enableEdgeToEdge()
-//        setContent {
-//
-//
-//            /**
-//             * Create the nav controller
-//             * https://developer.android.com/guide/navigation/navcontroller#kotlin
-//             */
-//            val navController = rememberNavController()
-//
-//            Location_Client_AndroidTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        text = "Row64 MQTT Client Signal Generator",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//
-//
-//                    BottomAppBarMain(this)
-//
-//                    // For testing - automatically switch activities when app launches
-////                    startActivity(locationIntent)
-//
-//
-//
-//                }
-//            }
-//
-//        }
 
 
     }
