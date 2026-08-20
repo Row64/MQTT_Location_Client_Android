@@ -258,11 +258,14 @@ class LocationServiceForeground : Service() {
         val cancelIntent = Intent(this, LocationServiceForeground::class.java)
         cancelIntent.putExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, true)
 
+        // I added "or PendingIntent.FLAG_MUTABLE" to resolve the issue with the app crashing when switching fragments
+        // https://stackoverflow.com/questions/72919110/how-to-solve-this-targeting-s-version-31-and-above-requires-that-one-of-flag
         val servicePendingIntent = PendingIntent.getService(
-            this, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            this, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
 
+        // I changed this flag from "0" to "PendingIntent.FLAG_MUTABLE"
         val activityPendingIntent = PendingIntent.getActivity(
-            this, 0, launchActivityIntent, 0)
+            this, 0, launchActivityIntent, PendingIntent.FLAG_MUTABLE)
 
         // 4. Build and issue the notification.
         // Notification Channel Id is ignored for Android pre O (26).

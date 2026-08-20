@@ -33,10 +33,10 @@ import kotlinx.serialization.json.*
  *  https://developer.android.com/guide/navigation/design/kotlin-dsl#routes
  *  https://developer.android.com/guide/navigation/design/type-safety
  */
-@Serializable
-data object Home
-@Serializable
-data object Location
+//@Serializable
+//data object Home
+//@Serializable
+//data object Location
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
