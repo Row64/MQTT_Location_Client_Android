@@ -37,6 +37,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // For HiveMQ
+    // https://hivemq.github.io/hivemq-mqtt-client/docs/installation/android/
+    packagingOptions {
+        resources {
+            excludes += listOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
+        }
+    }
+
     buildFeatures {
         compose = true
     }
@@ -52,8 +61,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // TEST - trying to resolve crash on switching out of send location fragment
-    implementation("androidx.work:work-runtime-ktx:2.11.2")
+    // HiveMQ
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
 
     // Fragments
     // https://developer.android.com/guide/fragments/create#kts
