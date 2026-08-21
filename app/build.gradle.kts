@@ -81,12 +81,12 @@ dependencies {
 
 //    implementation(libs.navigation.compose)
 //    implementation(libs.kotlinx.serialization.json)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Needed for depreciated libraries
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt
     implementation("androidx.appcompat:appcompat:1.8.0")                                        // Used in LocationActivity.kt
-    implementation("com.google.android.material:material:1.14.0")                                // Used in LocationActivity.kt
+    implementation("com.google.android.material:material:1.14.0")                               // Used in LocationActivity.kt
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

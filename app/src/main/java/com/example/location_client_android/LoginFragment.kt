@@ -1,20 +1,35 @@
 package com.example.location_client_android
 
+import android.R.attr.onClick
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+//import androidx.compose.ui.text.style.LineHeightStyle.Alignment
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+
 
 class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
@@ -42,7 +57,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                 // Compose UI elements go here
                 MaterialTheme {
 
-                    Btn()
+                    ConnectScreen()
 
 
 
@@ -60,15 +75,80 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 }
 
 
-
 @Composable
-fun Btn() {
-    Button(
-        onClick = {
-            println("Yay! You clicked a button. Good job.")
-        }
+fun ConnectScreen() {
+
+    // Variables to remember inputs
+//    var submittedHost by remember { mutableStateOf("") }
+//    var submittedPort by remember { mutableStateOf("") }
+//    var submittedUser by remember { mutableStateOf("") }
+//    var submittedPass by remember { mutableStateOf("") }
+
+    // Layout
+    Column(
+        modifier = Modifier
+            .padding(48.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.width(8.dp))
-        Text("The button")
+        // UI components
+        Title()
+        FieldHost()
+        FieldPort()
+        FieldUser()
+        FieldPass()
+        ButtonConnect( onClick = { println("Connect button clicked...") } )
+
     }
 }
+
+@Composable
+fun Title() {
+    Text(
+        text = "Connect to a Broker",
+        fontSize = 28.sp,
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier.padding(bottom = 32.dp)
+    )
+}
+
+@Composable
+fun ButtonConnect( onClick: () -> Unit) {
+    Button( onClick = { onClick() } ) {
+        Text("Connect")
+    }
+}
+
+@Composable
+fun FieldHost() {
+    OutlinedTextField(
+        state = rememberTextFieldState(),
+        label = { Text("Host") }
+    )
+}
+
+@Composable
+fun FieldPort() {
+    OutlinedTextField(
+        state = rememberTextFieldState(),
+        label = { Text("Port") }
+    )
+}
+
+@Composable
+fun FieldUser() {
+    OutlinedTextField(
+        state = rememberTextFieldState(),
+        label = { Text("User") }
+    )
+}
+
+@Composable
+fun FieldPass() {
+    OutlinedTextField(
+        state = rememberTextFieldState(),
+        label = { Text("Pass") }
+    )
+}
+
