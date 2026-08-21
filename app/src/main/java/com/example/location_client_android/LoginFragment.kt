@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -25,11 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+
+
+val host: String = ""
 
 
 class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
@@ -79,12 +88,6 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 @Composable
 fun ConnectScreen() {
 
-    // Variables to remember inputs
-//    var submittedHost by remember { mutableStateOf("") }
-//    var submittedPort by remember { mutableStateOf("") }
-//    var submittedUser by remember { mutableStateOf("") }
-//    var submittedPass by remember { mutableStateOf("") }
-
     // Layout
     Column(
         modifier = Modifier
@@ -93,9 +96,10 @@ fun ConnectScreen() {
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         // UI components
         Title()
-        Label()
+//        Label()
         FieldHost()
         FieldPort()
         FieldUser()
@@ -138,9 +142,17 @@ fun ButtonConnect( onClick: () -> Unit) {
 
 @Composable
 fun FieldHost() {
+
+    val hostState = rememberTextFieldState()
+
     OutlinedTextField(
-        state = rememberTextFieldState(),
-        label = { Text("Host") }
+        state = hostState,
+        label = { Text("Host") },
+        lineLimits = TextFieldLineLimits.SingleLine,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false
+        )
     )
 }
 
@@ -148,7 +160,14 @@ fun FieldHost() {
 fun FieldPort() {
     OutlinedTextField(
         state = rememberTextFieldState(),
-        label = { Text("Port") }
+        label = { Text("Port") },
+        inputTransformation = InputTransformation.maxLength(4),
+        lineLimits = TextFieldLineLimits.SingleLine,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Number
+        )
     )
 }
 
@@ -156,7 +175,12 @@ fun FieldPort() {
 fun FieldUser() {
     OutlinedTextField(
         state = rememberTextFieldState(),
-        label = { Text("User") }
+        label = { Text("User") },
+        lineLimits = TextFieldLineLimits.SingleLine,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false
+        )
     )
 }
 
@@ -164,7 +188,11 @@ fun FieldUser() {
 fun FieldPass() {
     OutlinedSecureTextField(
         state = rememberTextFieldState(),
-        label = { Text("Password") }
+        label = { Text("Password") },
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false
+        )
     )
 }
 
