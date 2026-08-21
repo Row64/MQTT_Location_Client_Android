@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-//import androidx.compose.ui.text.style.LineHeightStyle.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -94,6 +95,7 @@ fun ConnectScreen() {
     ) {
         // UI components
         Title()
+        Label()
         FieldHost()
         FieldPort()
         FieldUser()
@@ -106,17 +108,31 @@ fun ConnectScreen() {
 @Composable
 fun Title() {
     Text(
-        text = "Connect to a Broker",
+        text = stringResource(R.string.login_screen_title),
         fontSize = 28.sp,
         style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.padding(bottom = 32.dp)
+        modifier = Modifier.padding(bottom = 10.dp)
+    )
+}
+
+@Composable
+fun Label() {
+    Text(
+        text = stringResource(R.string.login_screen_label),
+        fontSize = 15.sp,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(bottom = 10.dp)
     )
 }
 
 @Composable
 fun ButtonConnect( onClick: () -> Unit) {
-    Button( onClick = { onClick() } ) {
-        Text("Connect")
+    Button(
+        onClick = {
+            onClick()
+        } )
+    {
+        Text(text = stringResource(R.string.connect_btn_connect))
     }
 }
 
@@ -146,9 +162,9 @@ fun FieldUser() {
 
 @Composable
 fun FieldPass() {
-    OutlinedTextField(
+    OutlinedSecureTextField(
         state = rememberTextFieldState(),
-        label = { Text("Pass") }
+        label = { Text("Password") }
     )
 }
 
