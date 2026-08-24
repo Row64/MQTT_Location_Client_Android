@@ -15,7 +15,6 @@
 
     <!--Text used on the login screen-->
     <string name="login_screen_title">Connect to a Broker</string>
-    <string name="login_screen_label">To connect to an MQTT broker, please provide a host (IP address or URL), port number, username, and password.</string>
     <string name="connect_btn_connect">Connect</string>
 
 </resources>

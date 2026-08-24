@@ -25,8 +25,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 
 /**
  *  Fragment destinations (type safe)

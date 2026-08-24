@@ -72,6 +72,8 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
 
 
+
+
                 }
             }
         }
@@ -99,12 +101,12 @@ fun ConnectScreen() {
 
         // UI components
         Title()
-//        Label()
-        FieldHost()
-        FieldPort()
-        FieldUser()
-        FieldPass()
-        ButtonConnect( onClick = { println("Connect button clicked...") } )
+//        FieldHost()
+//        FieldPort()
+//        FieldUser()
+//        FieldPass()
+//        ButtonConnect( onClick = { println("Connect button clicked...") } )
+        LoginComponents()
 
     }
 }
@@ -120,33 +122,19 @@ fun Title() {
 }
 
 @Composable
-fun Label() {
-    Text(
-        text = stringResource(R.string.login_screen_label),
-        fontSize = 15.sp,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(bottom = 10.dp)
-    )
-}
+fun LoginComponents() {
 
-@Composable
-fun ButtonConnect( onClick: () -> Unit) {
-    Button(
-        onClick = {
-            onClick()
-        } )
-    {
-        Text(text = stringResource(R.string.connect_btn_connect))
-    }
-}
+    // Login container variables
+    // For testing - might need to input into a ViewModel (?)
+    var stateHost = rememberTextFieldState()
+    var statePort = rememberTextFieldState()
+    var stateUser = rememberTextFieldState()
+    var statePass = rememberTextFieldState()
 
-@Composable
-fun FieldHost() {
 
-    val hostState = rememberTextFieldState()
-
+    // Host field
     OutlinedTextField(
-        state = hostState,
+        state = stateHost,
         label = { Text("Host") },
         lineLimits = TextFieldLineLimits.SingleLine,
         keyboardOptions = KeyboardOptions(
@@ -154,14 +142,13 @@ fun FieldHost() {
             autoCorrectEnabled = false
         )
     )
-}
 
-@Composable
-fun FieldPort() {
+
+    // Port field
     OutlinedTextField(
-        state = rememberTextFieldState(),
+        state = statePort,
         label = { Text("Port") },
-        inputTransformation = InputTransformation.maxLength(4),
+        inputTransformation = InputTransformation.maxLength(5),
         lineLimits = TextFieldLineLimits.SingleLine,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
@@ -169,12 +156,11 @@ fun FieldPort() {
             keyboardType = KeyboardType.Number
         )
     )
-}
 
-@Composable
-fun FieldUser() {
+
+    // Username field
     OutlinedTextField(
-        state = rememberTextFieldState(),
+        state = stateUser,
         label = { Text("User") },
         lineLimits = TextFieldLineLimits.SingleLine,
         keyboardOptions = KeyboardOptions(
@@ -182,17 +168,125 @@ fun FieldUser() {
             autoCorrectEnabled = false
         )
     )
-}
 
-@Composable
-fun FieldPass() {
+
+    // Password field
     OutlinedSecureTextField(
-        state = rememberTextFieldState(),
+        state = statePass,
         label = { Text("Password") },
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
             autoCorrectEnabled = false
         )
     )
+
+
+    // Connect button
+    Button(
+        onClick = {
+            // FOR TESTING ONLY!
+            println("Host: ${stateHost.text}" +
+                    "\nPort: ${statePort.text}" +
+                    "\nUser: ${stateUser.text}" +
+                    "\nPass: ${statePass.text}")
+        } )
+    {
+        Text(text = stringResource(R.string.connect_btn_connect))
+    }
+
+
+    // Connection status
+    /**
+     * This should indicate to the user if the connection attempt was successful or not,
+     * and print any returned MQTT connection issues.
+     *
+     * Consider placing in a text box. The text box should be centered, but the text within
+     * the box should be left-aligned
+     */
+    Text(
+        text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
+    )
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+//@Composable
+//fun ButtonConnect( onClick: () -> Unit) {
+//    Button(
+//        onClick = {
+//            onClick()
+//        } )
+//    {
+//        Text(text = stringResource(R.string.connect_btn_connect))
+//    }
+//}
+//
+//@Composable
+//fun FieldHost() {
+//
+////    val hostState = rememberTextFieldState()
+//
+//    OutlinedTextField(
+////        state = hostState,
+//        state = rememberTextFieldState(),
+//        label = { Text("Host") },
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//}
+//
+//@Composable
+//fun FieldPort() {
+//    OutlinedTextField(
+//        state = rememberTextFieldState(),
+//        label = { Text("Port") },
+//        inputTransformation = InputTransformation.maxLength(5),
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false,
+//            keyboardType = KeyboardType.Number
+//        )
+//    )
+//}
+//
+//@Composable
+//fun FieldUser() {
+//    OutlinedTextField(
+//        state = rememberTextFieldState(),
+//        label = { Text("User") },
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//}
+//
+//@Composable
+//fun FieldPass() {
+//    OutlinedSecureTextField(
+//        state = rememberTextFieldState(),
+//        label = { Text("Password") },
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//}
 
