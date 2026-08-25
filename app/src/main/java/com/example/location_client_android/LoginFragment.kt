@@ -36,18 +36,20 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-
-
-val host: String = ""
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
-    val login = MqLogin()
+    // TESTING *********************
+    // ShareViewModel
+//    val model = ViewModelProvider(requireActivity()).get(ViewModelPrimary::class.java)
 
 
     /**
-     * Enables the use of Composables in a classic fragment.
+     * Enables the use of Composables in a legacy fragment.
      * This requires the XML layout to have a ComposeView block
      *
      * https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/compose-in-views#compose-in-fragments
@@ -68,10 +70,6 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                 MaterialTheme {
 
                     ConnectScreen()
-
-
-
-
 
 
                 }
@@ -121,8 +119,14 @@ fun Title() {
     )
 }
 
+/**
+ * Pass the ViewModel into the composable.
+ * https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state
+ *
+ * The ViewModel is not declared anywhere else; just present here as this parameter
+ */
 @Composable
-fun LoginComponents() {
+fun LoginComponents(viewModel: ViewModelPrimary = viewModel()) {
 
     // Login container variables
     // For testing - might need to input into a ViewModel (?)
@@ -185,10 +189,21 @@ fun LoginComponents() {
     Button(
         onClick = {
             // FOR TESTING ONLY!
-            println("Host: ${stateHost.text}" +
+            println("RAW --------------------" +
+                    "\nHost: ${stateHost.text}" +
                     "\nPort: ${statePort.text}" +
                     "\nUser: ${stateUser.text}" +
                     "\nPass: ${statePass.text}")
+
+            // FOR TESTING
+            println("Before assignment:")
+            viewModel.print()
+//            viewModel.mqHost = stateHost.text.toString()
+            viewModel.mqHost.value = stateHost.text.toString()
+            println("After assignment:")
+            viewModel.print()
+
+
         } )
     {
         Text(text = stringResource(R.string.connect_btn_connect))

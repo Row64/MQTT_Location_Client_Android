@@ -27,6 +27,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 
@@ -285,8 +286,12 @@ class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
                 LocationServiceForeground.EXTRA_LOCATION
             )
 
+            // FOR TESTING
+            val model = ViewModelProvider(requireActivity()).get(ViewModelPrimary::class.java)
+
             if (location != null) {
-                logResultsToScreen("Foreground location: ${location.toText()}")
+                logResultsToScreen("Foreground location: ${location.toText()}" +
+                        "\nTEST: Host = ${model.mqHost}")
             }
         }
     }

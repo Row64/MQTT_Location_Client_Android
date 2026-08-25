@@ -64,6 +64,10 @@ dependencies {
     // HiveMQ
     implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
 
+    // ViewModel
+    // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#0
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+
     // Fragments
     // https://developer.android.com/guide/fragments/create#kts
     implementation("androidx.fragment:fragment-ktx:1.9.0")
