@@ -36,9 +36,11 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlin.getValue
 
 
 class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
@@ -46,6 +48,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
     // TESTING *********************
     // ShareViewModel
 //    val model = ViewModelProvider(requireActivity()).get(ViewModelPrimary::class.java)
+    private val viewModel: ViewModelPrimary by activityViewModels()
 
 
     /**
@@ -69,7 +72,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                 // Compose UI elements go here
                 MaterialTheme {
 
-                    ConnectScreen()
+                    ConnectScreen(viewModel)
 
 
                 }
@@ -86,7 +89,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
 
 @Composable
-fun ConnectScreen() {
+fun ConnectScreen(viewModel: ViewModelPrimary) {
 
     // Layout
     Column(
@@ -104,7 +107,105 @@ fun ConnectScreen() {
 //        FieldUser()
 //        FieldPass()
 //        ButtonConnect( onClick = { println("Connect button clicked...") } )
-        LoginComponents()
+//        LoginComponents()
+
+
+        // Login components
+        var stateHost = rememberTextFieldState()
+        var statePort = rememberTextFieldState()
+        var stateUser = rememberTextFieldState()
+        var statePass = rememberTextFieldState()
+
+
+        // Host field
+        OutlinedTextField(
+            state = stateHost,
+            label = { Text("Host") },
+            lineLimits = TextFieldLineLimits.SingleLine,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false
+            )
+        )
+
+
+        // Port field
+        OutlinedTextField(
+            state = statePort,
+            label = { Text("Port") },
+            inputTransformation = InputTransformation.maxLength(5),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Number
+            )
+        )
+
+
+        // Username field
+        OutlinedTextField(
+            state = stateUser,
+            label = { Text("User") },
+            lineLimits = TextFieldLineLimits.SingleLine,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false
+            )
+        )
+
+
+        // Password field
+        OutlinedSecureTextField(
+            state = statePass,
+            label = { Text("Password") },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrectEnabled = false
+            )
+        )
+
+
+        // Connect button
+        Button(
+            onClick = {
+                // FOR TESTING ONLY!
+                println("RAW --------------------" +
+                        "\nHost: ${stateHost.text}" +
+                        "\nPort: ${statePort.text}" +
+                        "\nUser: ${stateUser.text}" +
+                        "\nPass: ${statePass.text}")
+
+//                // FOR TESTING
+//                println("Before assignment:")
+//                viewModel.print()
+////            viewModel.mqHost = stateHost.text.toString()
+//                viewModel.mqHost.value = stateHost.text.toString()
+//                println("After assignment:")
+//                viewModel.print()
+
+
+                // Send login data to the view model
+                viewModel.mqHost.value = "Hard-coded host value"
+
+            } )
+        {
+            Text(text = stringResource(R.string.connect_btn_connect))
+        }
+
+
+        // Connection status
+        /**
+         * This should indicate to the user if the connection attempt was successful or not,
+         * and print any returned MQTT connection issues.
+         *
+         * Consider placing in a text box. The text box should be centered, but the text within
+         * the box should be left-aligned
+         */
+        Text(
+            text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
+        )
+
 
     }
 }
@@ -125,107 +226,107 @@ fun Title() {
  *
  * The ViewModel is not declared anywhere else; just present here as this parameter
  */
-@Composable
-fun LoginComponents(viewModel: ViewModelPrimary = viewModel()) {
-
-    // Login container variables
-    // For testing - might need to input into a ViewModel (?)
-    var stateHost = rememberTextFieldState()
-    var statePort = rememberTextFieldState()
-    var stateUser = rememberTextFieldState()
-    var statePass = rememberTextFieldState()
-
-
-    // Host field
-    OutlinedTextField(
-        state = stateHost,
-        label = { Text("Host") },
-        lineLimits = TextFieldLineLimits.SingleLine,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrectEnabled = false
-        )
-    )
-
-
-    // Port field
-    OutlinedTextField(
-        state = statePort,
-        label = { Text("Port") },
-        inputTransformation = InputTransformation.maxLength(5),
-        lineLimits = TextFieldLineLimits.SingleLine,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrectEnabled = false,
-            keyboardType = KeyboardType.Number
-        )
-    )
-
-
-    // Username field
-    OutlinedTextField(
-        state = stateUser,
-        label = { Text("User") },
-        lineLimits = TextFieldLineLimits.SingleLine,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrectEnabled = false
-        )
-    )
-
-
-    // Password field
-    OutlinedSecureTextField(
-        state = statePass,
-        label = { Text("Password") },
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrectEnabled = false
-        )
-    )
-
-
-    // Connect button
-    Button(
-        onClick = {
-            // FOR TESTING ONLY!
-            println("RAW --------------------" +
-                    "\nHost: ${stateHost.text}" +
-                    "\nPort: ${statePort.text}" +
-                    "\nUser: ${stateUser.text}" +
-                    "\nPass: ${statePass.text}")
-
-            // FOR TESTING
-            println("Before assignment:")
-            viewModel.print()
-//            viewModel.mqHost = stateHost.text.toString()
-            viewModel.mqHost.value = stateHost.text.toString()
-            println("After assignment:")
-            viewModel.print()
-
-
-        } )
-    {
-        Text(text = stringResource(R.string.connect_btn_connect))
-    }
-
-
-    // Connection status
-    /**
-     * This should indicate to the user if the connection attempt was successful or not,
-     * and print any returned MQTT connection issues.
-     *
-     * Consider placing in a text box. The text box should be centered, but the text within
-     * the box should be left-aligned
-     */
-    Text(
-        text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
-    )
-
-
-
-
-}
+//@Composable
+//fun LoginComponents(viewModel: ViewModelPrimary = viewModel()) {
+//
+//    // Login container variables
+//    // For testing - might need to input into a ViewModel (?)
+//    var stateHost = rememberTextFieldState()
+//    var statePort = rememberTextFieldState()
+//    var stateUser = rememberTextFieldState()
+//    var statePass = rememberTextFieldState()
+//
+//
+//    // Host field
+//    OutlinedTextField(
+//        state = stateHost,
+//        label = { Text("Host") },
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//
+//
+//    // Port field
+//    OutlinedTextField(
+//        state = statePort,
+//        label = { Text("Port") },
+//        inputTransformation = InputTransformation.maxLength(5),
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false,
+//            keyboardType = KeyboardType.Number
+//        )
+//    )
+//
+//
+//    // Username field
+//    OutlinedTextField(
+//        state = stateUser,
+//        label = { Text("User") },
+//        lineLimits = TextFieldLineLimits.SingleLine,
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//
+//
+//    // Password field
+//    OutlinedSecureTextField(
+//        state = statePass,
+//        label = { Text("Password") },
+//        keyboardOptions = KeyboardOptions(
+//            capitalization = KeyboardCapitalization.None,
+//            autoCorrectEnabled = false
+//        )
+//    )
+//
+//
+//    // Connect button
+//    Button(
+//        onClick = {
+//            // FOR TESTING ONLY!
+//            println("RAW --------------------" +
+//                    "\nHost: ${stateHost.text}" +
+//                    "\nPort: ${statePort.text}" +
+//                    "\nUser: ${stateUser.text}" +
+//                    "\nPass: ${statePass.text}")
+//
+//            // FOR TESTING
+//            println("Before assignment:")
+//            viewModel.print()
+////            viewModel.mqHost = stateHost.text.toString()
+//            viewModel.mqHost.value = stateHost.text.toString()
+//            println("After assignment:")
+//            viewModel.print()
+//
+//
+//        } )
+//    {
+//        Text(text = stringResource(R.string.connect_btn_connect))
+//    }
+//
+//
+//    // Connection status
+//    /**
+//     * This should indicate to the user if the connection attempt was successful or not,
+//     * and print any returned MQTT connection issues.
+//     *
+//     * Consider placing in a text box. The text box should be centered, but the text within
+//     * the box should be left-aligned
+//     */
+//    Text(
+//        text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
+//    )
+//
+//
+//
+//
+//}
 
 
 

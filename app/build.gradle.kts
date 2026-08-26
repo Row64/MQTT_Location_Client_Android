@@ -67,6 +67,8 @@ dependencies {
     // ViewModel
     // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#0
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.12.0")
+
 
     // Fragments
     // https://developer.android.com/guide/fragments/create#kts

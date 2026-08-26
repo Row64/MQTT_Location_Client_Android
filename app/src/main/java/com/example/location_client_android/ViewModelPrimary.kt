@@ -15,10 +15,10 @@ class ViewModelPrimary : ViewModel() {
      *
      * Made private to ensure that states are not modified by external classes.
      */
-    private val _uiStateLogin = MutableStateFlow(LoginFragment())
-    val uiStateLogin: StateFlow<LoginFragment> = _uiStateLogin.asStateFlow()
-    private val _uiStateLocation = MutableStateFlow(LocationFragment())
-    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
+//    private val _uiStateLogin = MutableStateFlow(LoginFragment())
+//    val uiStateLogin: StateFlow<LoginFragment> = _uiStateLogin.asStateFlow()
+//    private val _uiStateLocation = MutableStateFlow(LocationFragment())
+//    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
 
 
     // FOR TESTING ONLY
@@ -27,7 +27,7 @@ class ViewModelPrimary : ViewModel() {
 //    var mqUser: String? = null
 //    var mqPass: String? = null
 
-    val mqHost = MutableLiveData<String>()
+    val mqHost = MutableLiveData<String?>()
 
     // FOR TESTING ONLY
     fun print() {
