@@ -25,6 +25,8 @@ class ViewModelPrimary : ViewModel() {
         private set // Only change the state from within this class
     var loginFieldError by mutableStateOf(false)
         private set
+    var loginFieldEnabled by mutableStateOf(true)
+        private set
 
 
 
@@ -51,9 +53,13 @@ class ViewModelPrimary : ViewModel() {
 
             // Disable the Connect button starting after the basic credentials check
             // No need to disable the button every time it's selected, especially if there's an error
+            // Also disable the text fields during a connection
             connectBtnEnabled = false
+            loginFieldEnabled = false
 
-            // Attempt to connect ...
+            // Attempt to connect
+            var client = MqClient(mqLogin)
+            client.mqConnectAndSend3()
 
         }
         catch(e: MqCredentialException) {
@@ -63,10 +69,11 @@ class ViewModelPrimary : ViewModel() {
 
             println(e.message)
             toggleFieldError(true)
-            return
 
             // NOTIFY USER
             // ...
+
+            return
 
         }
 
@@ -111,13 +118,30 @@ class ViewModelPrimary : ViewModel() {
                 throw MqCredentialException("Port must be a positive integer within the range of 1 to 65,535.")
             }
 
-            // Assign user inputs to MqLogin object
-            // ...
+            // Assign required user inputs to MqLogin object
+            mqLogin.host = inputHost.value!!
+            mqLogin.port = portInt
+
+            // Assign additional inputs to the MqLogin object, if present.
+            // Username and password are only assigned if they are both present.
+            if (!(inputUser.value.equals(null)
+                || inputPass.value.equals(null)
+                || inputUser.value.equals("")
+                || inputPass.value.equals("")))
+            {
+                mqLogin.user = inputUser.value
+                mqLogin.pass = inputPass.value
+            }
 
 
+            // FOR TESTING
+            println("MqLogin object values:" +
+                    "\n\tHost: ${mqLogin.host}" +
+                    "\n\tPort: ${mqLogin.port}" +
+                    "\n\tUser: ${mqLogin.user}" +
+                    "\n\tPass: ${mqLogin.pass}")
 
         }
-
 
 
     }
@@ -134,6 +158,11 @@ class ViewModelPrimary : ViewModel() {
 
     fun toggleFieldError(toggle: Boolean) {
         loginFieldError = toggle
+    }
+
+
+    fun toggleLoginFieldEnabled(toggle: Boolean) {
+        loginFieldEnabled = toggle
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -94,6 +94,7 @@ fun TestLayout( /* viewModel: ViewModelPrimary = viewModel() */ viewModel: ViewM
             // Re-enable Connect button on login fragment
             viewModel.toggleConnectBtn(true)
             viewModel.toggleFieldError(false)
+            viewModel.toggleLoginFieldEnabled(true)
 
 
 

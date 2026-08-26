@@ -126,7 +126,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false
             ),
-            isError = viewModel.loginFieldError
+            isError = viewModel.loginFieldError,
+            enabled = viewModel.loginFieldEnabled
         )
 
 
@@ -141,7 +142,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Number
             ),
-            isError = viewModel.loginFieldError
+            isError = viewModel.loginFieldError,
+            enabled = viewModel.loginFieldEnabled
         )
 
 
@@ -153,7 +155,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false
-            )
+            ),
+            enabled = viewModel.loginFieldEnabled
         )
 
 
@@ -164,7 +167,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false
-            )
+            ),
+            enabled = viewModel.loginFieldEnabled
         )
 
 
