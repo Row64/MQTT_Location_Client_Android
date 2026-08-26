@@ -24,12 +24,59 @@ class ViewModelPrimary : ViewModel() {
 
 
     // Raw user input variables
-    // Values retrieved from text boxes are Strings by default
+    // Values retrieved from text boxes are CharSequence by default
     var inputHost = MutableLiveData<String?>()
     var inputPort = MutableLiveData<String?>()
     var inputUser = MutableLiveData<String?>()
     var inputPass = MutableLiveData<String?>()
 
+    // MQTT login object
+    private var mqLogin = MqLogin()
+
+    // MQTT client object
+    lateinit var mqClient: MqClient
+
+
+    fun tryConnect() {
+
+
+        // disable Connect button
+        // only re-enable button after successful try or catching an exception
+        // ...
+
+        try {
+            setCredentials()
+
+        }
+        catch(e: MqLoginException) {
+
+            println(e.message)
+
+            // ...
+        }
+
+    }
+
+    /**
+     * Set the inputted credentials to the login object
+     */
+    private fun setCredentials() {
+
+        // Check for required minimum credentials
+        if (inputHost.value.equals(null)
+            || inputPort.value.equals(null)
+            || inputHost.value.equals("")
+            || inputPort.value.equals(""))
+        {
+            throw MqLoginException(
+                "Missing a required credential. Host and Port are required." +
+                    "\n\tHost: ${inputHost.value}" +
+                    "\n\tPort: ${inputPort.value}")
+        }
+
+
+
+    }
 
 
 }

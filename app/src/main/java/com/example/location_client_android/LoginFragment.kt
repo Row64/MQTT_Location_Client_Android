@@ -191,6 +191,9 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 viewModel.inputUser.value = stateUser.text.toString()
                 viewModel.inputPass.value = statePass.text.toString()
 
+                // Attempt the connection to the MQTT broker
+                viewModel.tryConnect()
+
             } )
         {
             Text(text = stringResource(R.string.connect_btn_connect))

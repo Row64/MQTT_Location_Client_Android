@@ -13,21 +13,10 @@ class MqLogin() {
     }
 
 
-
-    // Should I make these private? **************************************************
-
     // Core login variables
     lateinit var host: String
     var port: Int = -1
     var user: String? = null
     var pass: String? = null
-
-
-    /**
-     * Retrieve the login from the UI
-     */
-    fun getLogin() {
-
-    }
 
 }
