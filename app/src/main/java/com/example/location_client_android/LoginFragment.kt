@@ -125,7 +125,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false
-            )
+            ),
+            isError = viewModel.loginFieldError
         )
 
 
@@ -139,7 +140,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Number
-            )
+            ),
+            isError = viewModel.loginFieldError
         )
 
 
@@ -184,9 +186,6 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 //                viewModel.mqHost.value = stateHost.text.toString()
 //                println("After assignment:")
 //                viewModel.print()
-
-                // Disable the button (TEST VERSION)
-                viewModel.toggleConnectBtn(false)
 
 
                 // Send login data to the view model

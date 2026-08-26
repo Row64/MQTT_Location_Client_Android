@@ -5,10 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import com.example.location_client_android.LoginFragment
 
 class ViewModelPrimary : ViewModel() {
 
@@ -27,6 +23,8 @@ class ViewModelPrimary : ViewModel() {
     // Compose UI variables
     var connectBtnEnabled by mutableStateOf(true)
         private set // Only change the state from within this class
+    var loginFieldError by mutableStateOf(false)
+        private set
 
 
 
@@ -46,22 +44,30 @@ class ViewModelPrimary : ViewModel() {
 
     fun tryConnect() {
 
-
-        // disable Connect button
-        // only re-enable button after successful try or catching an exception
-        // ...
-
         try {
+
+            // Basic input validation and assign user input to MqLogin object
             setCredentials()
 
+            // Disable the Connect button starting after the basic credentials check
+            // No need to disable the button every time it's selected, especially if there's an error
+            connectBtnEnabled = false
+
+            // Attempt to connect ...
+
         }
-        catch(e: MqLoginException) {
+        catch(e: MqCredentialException) {
+            // This exception should only be caught if a required credential is missing,
+            // or if the format is bad.
+            // Host and Port are required. Port must be an integer.
 
             println(e.message)
+            toggleFieldError(true)
+            return
 
+            // NOTIFY USER
             // ...
 
-            // Re-enable Connect button
         }
 
     }
@@ -77,21 +83,38 @@ class ViewModelPrimary : ViewModel() {
             || inputHost.value.equals("")
             || inputPort.value.equals(""))
         {
-            throw MqLoginException(
+            // Make fields show error indicator
+            toggleFieldError(true)
+
+            throw MqCredentialException(
                 "Missing a required credential. Host and Port are required." +
                     "\n\tHost: ${inputHost.value}" +
                     "\n\tPort: ${inputPort.value}")
-
-            // Set OutlinedTextField.isError to True
-            // https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-outlined-text-field.html
-
-            // ...
-
         }
         else {
 
+            // Remove error visual in case it had been enabled from a previous failed check
+            toggleFieldError(false)
+
             // Convert the port entry into an Int
+            var portInt: Int
+            try {
+                portInt = inputPort.value!!.toInt()
+
+                // Ensure port is within valid range
+                if (!(portInt in 1..65535)) {
+                    throw MqCredentialException("Provided port number is out of range. Valid range is: 1 - 65,535")
+                }
+
+            }
+            catch(e: NumberFormatException) {
+                throw MqCredentialException("Port must be a positive integer within the range of 1 to 65,535.")
+            }
+
+            // Assign user inputs to MqLogin object
             // ...
+
+
 
         }
 
@@ -101,11 +124,19 @@ class ViewModelPrimary : ViewModel() {
 
 
 
-    // UI methods
+    // ---------------------------------------------------------------------------------------------
+    // UI METHODS
 
     fun toggleConnectBtn(toggle: Boolean) {
         connectBtnEnabled = toggle
     }
+
+
+    fun toggleFieldError(toggle: Boolean) {
+        loginFieldError = toggle
+    }
+
+    // ---------------------------------------------------------------------------------------------
 
 
 }
