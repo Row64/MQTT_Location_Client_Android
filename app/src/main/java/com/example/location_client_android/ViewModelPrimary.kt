@@ -21,19 +21,15 @@ class ViewModelPrimary : ViewModel() {
 //    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
 
 
-    // FOR TESTING ONLY
-//    var mqHost: String? = null
-//    var mqPort: Int = -1
-//    var mqUser: String? = null
-//    var mqPass: String? = null
 
-    val mqHost = MutableLiveData<String?>()
 
-    // FOR TESTING ONLY
-    fun print() {
-        println("ViewModel variables:" +
-                "\n\tHost: ${mqHost.value}" +
-                "\n\t...")
-    }
+    // Raw user input variables
+    // Values retrieved from text boxes are Strings by default
+    var inputHost = MutableLiveData<String?>()
+    var inputPort = MutableLiveData<String?>()
+    var inputUser = MutableLiveData<String?>()
+    var inputPass = MutableLiveData<String?>()
+
+
 
 }

@@ -186,7 +186,10 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 
 
                 // Send login data to the view model
-                viewModel.mqHost.value = "Hard-coded host value"
+                viewModel.inputHost.value = stateHost.text.toString()
+                viewModel.inputPort.value = statePort.text.toString()
+                viewModel.inputUser.value = stateUser.text.toString()
+                viewModel.inputPass.value = statePass.text.toString()
 
             } )
         {

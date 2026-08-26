@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 
 class HomeFragment : Fragment(R.layout.layout_fragment_home) {
 
@@ -73,16 +74,23 @@ fun TestLayout( /* viewModel: ViewModelPrimary = viewModel() */ viewModel: ViewM
 
     // TESTING
     // https://proandroiddev.com/jetpack-compose-with-android-fragment-ui-data-sharing-ae7077a9a160
-    val message by viewModel.mqHost.observeAsState()
+    val viewHost by viewModel.inputHost.observeAsState()
+    val viewPort by viewModel.inputPort.observeAsState()
+    val viewUser by viewModel.inputUser.observeAsState()
+    val viewPass by viewModel.inputPass.observeAsState()
 
     // FOR TESTING
     Button(
         onClick = {
-            // FOR TESTING ONLY!
+
+            // FOR TESTING ONLY! *************************
             println("Home button:")
             // FOR TESTING
-//            viewModel.print()
-            println(message)
+            println("Variables from login fragment:" +
+                    "\n\tHost: $viewHost" +
+                    "\n\tPort: $viewPort" +
+                    "\n\tUser: $viewUser" +
+                    "\n\tPass: $viewPass")
 
 
 
