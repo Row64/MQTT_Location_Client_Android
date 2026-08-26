@@ -91,6 +91,8 @@ fun TestLayout( /* viewModel: ViewModelPrimary = viewModel() */ viewModel: ViewM
                     "\n\tPort: $viewPort" +
                     "\n\tUser: $viewUser" +
                     "\n\tPass: $viewPass")
+            // Re-enable Connect button on login fragment
+            viewModel.toggleConnectBtn(true)
 
 
 

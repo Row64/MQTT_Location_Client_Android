@@ -1,5 +1,8 @@
 package com.example.location_client_android
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +23,10 @@ class ViewModelPrimary : ViewModel() {
 //    private val _uiStateLocation = MutableStateFlow(LocationFragment())
 //    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
 
+
+    // Compose UI variables
+    var connectBtnEnabled by mutableStateOf(true)
+        private set // Only change the state from within this class
 
 
 
@@ -53,6 +60,8 @@ class ViewModelPrimary : ViewModel() {
             println(e.message)
 
             // ...
+
+            // Re-enable Connect button
         }
 
     }
@@ -72,10 +81,30 @@ class ViewModelPrimary : ViewModel() {
                 "Missing a required credential. Host and Port are required." +
                     "\n\tHost: ${inputHost.value}" +
                     "\n\tPort: ${inputPort.value}")
+
+            // Set OutlinedTextField.isError to True
+            // https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-outlined-text-field.html
+
+            // ...
+
+        }
+        else {
+
+            // Convert the port entry into an Int
+            // ...
+
         }
 
 
 
+    }
+
+
+
+    // UI methods
+
+    fun toggleConnectBtn(toggle: Boolean) {
+        connectBtnEnabled = toggle
     }
 
 

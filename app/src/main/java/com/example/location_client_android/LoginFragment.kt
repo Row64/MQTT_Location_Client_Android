@@ -169,6 +169,7 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
         // Connect button
         Button(
             onClick = {
+
                 // FOR TESTING ONLY!
                 println("RAW --------------------" +
                         "\nHost: ${stateHost.text}" +
@@ -184,6 +185,9 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 //                println("After assignment:")
 //                viewModel.print()
 
+                // Disable the button (TEST VERSION)
+                viewModel.toggleConnectBtn(false)
+
 
                 // Send login data to the view model
                 viewModel.inputHost.value = stateHost.text.toString()
@@ -194,9 +198,12 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 // Attempt the connection to the MQTT broker
                 viewModel.tryConnect()
 
-            } )
+            },
+            enabled = viewModel.connectBtnEnabled
+        )
         {
             Text(text = stringResource(R.string.connect_btn_connect))
+
         }
 
 
