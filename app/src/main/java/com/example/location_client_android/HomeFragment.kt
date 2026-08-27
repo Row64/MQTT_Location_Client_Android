@@ -95,6 +95,7 @@ fun TestLayout( /* viewModel: ViewModelPrimary = viewModel() */ viewModel: ViewM
             viewModel.toggleConnectBtn(true)
             viewModel.toggleFieldError(false)
             viewModel.toggleLoginFieldEnabled(true)
+            viewModel.toggleDisconnectBtn(false)
 
 
 

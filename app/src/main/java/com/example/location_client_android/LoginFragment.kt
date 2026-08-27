@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -17,6 +19,7 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
@@ -172,16 +175,22 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
         )
 
 
-        // Connect button
-        Button(
-            onClick = {
+        // Buttons
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
 
-                // FOR TESTING ONLY!
-                println("RAW --------------------" +
-                        "\nHost: ${stateHost.text}" +
-                        "\nPort: ${statePort.text}" +
-                        "\nUser: ${stateUser.text}" +
-                        "\nPass: ${statePass.text}")
+            // Connect button
+            Button(
+                onClick = {
+
+                    // FOR TESTING ONLY!
+                    println("RAW --------------------" +
+                            "\nHost: ${stateHost.text}" +
+                            "\nPort: ${statePort.text}" +
+                            "\nUser: ${stateUser.text}" +
+                            "\nPass: ${statePass.text}")
 
 //                // FOR TESTING
 //                println("Before assignment:")
@@ -192,22 +201,46 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 //                viewModel.print()
 
 
-                // Send login data to the view model
-                viewModel.inputHost.value = stateHost.text.toString()
-                viewModel.inputPort.value = statePort.text.toString()
-                viewModel.inputUser.value = stateUser.text.toString()
-                viewModel.inputPass.value = statePass.text.toString()
+                    // Send login data to the view model
+                    viewModel.inputHost.value = stateHost.text.toString()
+                    viewModel.inputPort.value = statePort.text.toString()
+                    viewModel.inputUser.value = stateUser.text.toString()
+                    viewModel.inputPass.value = statePass.text.toString()
 
-                // Attempt the connection to the MQTT broker
-                viewModel.tryConnect()
+                    // Attempt the connection to the MQTT broker
+                    viewModel.tryConnect()
 
-            },
-            enabled = viewModel.connectBtnEnabled
-        )
-        {
-            Text(text = stringResource(R.string.connect_btn_connect))
+                },
+                enabled = viewModel.connectBtnEnabled,
+//                modifier = Modifier.size(width = 80.dp, height = 20.dp)
+            )
+            {
+                Text(text = stringResource(R.string.connect_btn_connect))
+            }
+
+
+            // Cancel/Disconnect button
+            FilledTonalButton (
+                onClick = {
+
+                    // Disconnect from server or cancel connection attempt
+                    // ...
+
+                    // Reset UI state
+                    // ...
+
+                },
+                enabled = viewModel.disconnectBtnEnabled
+            )
+            {
+                Text(text = stringResource(R.string.disconnect_btn_cancel))
+            }
+
+
 
         }
+
+
 
 
         // Connection status

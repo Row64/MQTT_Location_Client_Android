@@ -23,6 +23,8 @@ class ViewModelPrimary : ViewModel() {
     // Compose UI variables
     var connectBtnEnabled by mutableStateOf(true)
         private set // Only change the state from within this class
+    var disconnectBtnEnabled by mutableStateOf(false)
+        private set
     var loginFieldError by mutableStateOf(false)
         private set
     var loginFieldEnabled by mutableStateOf(true)
@@ -55,6 +57,7 @@ class ViewModelPrimary : ViewModel() {
             // No need to disable the button every time it's selected, especially if there's an error
             // Also disable the text fields during a connection
             connectBtnEnabled = false
+            disconnectBtnEnabled = true
             loginFieldEnabled = false
 
             // Attempt to connect
@@ -68,7 +71,8 @@ class ViewModelPrimary : ViewModel() {
             // Host and Port are required. Port must be an integer.
 
             println(e.message)
-            toggleFieldError(true)
+//            toggleFieldError(true)
+            loginFieldError = true
 
             // NOTIFY USER
             // ...
@@ -91,7 +95,8 @@ class ViewModelPrimary : ViewModel() {
             || inputPort.value.equals(""))
         {
             // Make fields show error indicator
-            toggleFieldError(true)
+//            toggleFieldError(true)
+            loginFieldError = true
 
             throw MqCredentialException(
                 "Missing a required credential. Host and Port are required." +
@@ -101,7 +106,8 @@ class ViewModelPrimary : ViewModel() {
         else {
 
             // Remove error visual in case it had been enabled from a previous failed check
-            toggleFieldError(false)
+//            toggleFieldError(false)
+            loginFieldError = false
 
             // Convert the port entry into an Int
             var portInt: Int
@@ -153,6 +159,11 @@ class ViewModelPrimary : ViewModel() {
 
     fun toggleConnectBtn(toggle: Boolean) {
         connectBtnEnabled = toggle
+    }
+
+
+    fun toggleDisconnectBtn(toggle: Boolean) {
+        disconnectBtnEnabled = toggle
     }
 
 
