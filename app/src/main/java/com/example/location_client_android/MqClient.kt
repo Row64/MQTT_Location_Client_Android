@@ -1,12 +1,24 @@
+/**
+ * Implementation of the HiveMQ Client library is based on the documentation:
+ * https://hivemq.github.io/hivemq-mqtt-client/
+ * https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-hivemq-mqtt-client/
+ */
+
 package com.example.location_client_android
 
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
+import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
+import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 class MqClient(val login: MqLogin) {
+
+    // ---------------------------------------------------------------------------------------------
+    // MQTT CLIENT OBJECTS
 
     // MQTT 3 client
     private var client3: Mqtt3AsyncClient = MqttClient.builder()
@@ -26,39 +38,128 @@ class MqClient(val login: MqLogin) {
         .sslWithDefaultConfig()
         .buildAsync()
 
+    // Async connection status variables
+    lateinit private var connAck3: CompletableFuture<Mqtt3ConnAck>
+    lateinit private var connAck5: CompletableFuture<Mqtt5ConnAck>
+
+    // ---------------------------------------------------------------------------------------------
+    // CONNECT METHODS
 
     /**
-     * IMPLEMENTATION GOALS
+     * This is the primary connection method used.
      *
-     *  - Test no auth
-     *      - Hive server does not support no auth (no username/password)
-     *  - Implement MQTT 5 connectivity
-     *      - Include the ability to detect the broker's version
-     *      - Connect with detected protocol
-     *          - Or, try 5 first, if connection fails, try 3?
-     *  - Implement advanced authentication
-     *  - Implement additional features from library
+     * This method cansists of two supporting methods:
+     *  - mqConnect5()
+     *  - mqConnect3()
      *
-     */
-
-
-
-    // Use a generic function to determine and return client according to highest supported version? ********************
-
-
-    /**
-     * Establishes a connection with the broker.
+     *  The HiveMQ Client library does not include automatic fallback features. So,
+     *  if you try to use a v5 client and connect to a v3.1.1 broker, the connection
+     *  will fail, and the client will not automatically fall back to v3.
      *
-     * Needs to be able to establish either a version 3 or 5 connection ...*********************
+     *  To handle this, in this mqConnect() method, I first attempt to connect to a
+     *  broker using the v5 client, calling the mqConnect5() client. If this connection
+     *  attempt fails, then mqConnect() will attempt the same connection using the v3
+     *  client, calling mqConnect3()
+     *
+     *  A truly failed connection occurs only if the client fails to connect to the broker
+     *  with both version 5 and 3.1.1.
      */
     fun mqConnect() {
 
-        println("ERROR: Method 'mqConnect' is not yet implemented.")
+        // How to identify a failed connection?
+        // Does it throw an exception?
+
+        // Maybe have the connect method throw a custom exception if it cannot connect,
+        // triggering the attempt to try the next MQTT version
+
+        mqConnect3()
 
     }
 
 
 
+    private fun mqConnect3() {
+
+        println("Got to mqConnect3()")
+
+        println("Attempting to connect with version 3 using basic authentication...")
+
+        client3.connectWith()
+            .simpleAuth()
+            .username(login.user!!)
+            .password(login.pass!!.toByteArray())
+            .applySimpleAuth()
+            .send()
+            .whenCompleteAsync { _, throwable ->
+                // For failure
+                if (throwable != null) {
+                    println("Connection failed")
+
+                    // Reset the UI
+                    // ...
+
+
+
+                }
+                // For success
+                else {
+                    println("Connection was successful")
+
+                    // Enable send button
+                    // ...
+
+                }
+
+            }
+
+
+
+
+    }
+
+
+
+
+    private fun mqConnect5() {
+        // ...
+        println("Error: Method 'mqConnect5' is not yet implemented...")
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // PUBLISH METHODS
+
+
+    // ...
+
+
+    fun mqPublish3(topic: String, payload: ByteArray) {
+        client3.publishWith()
+            .topic(topic)
+            .payload(payload)
+            .qos(MqttQos.EXACTLY_ONCE)
+            .send()
+            .whenComplete { publish, throwable ->
+                // For error
+                if (throwable != null) {
+                    println("Failed to send message")
+                    println(throwable.message)
+                }
+                // For success
+                else {
+                    println("Message sent")
+                }
+            }
+    }
+
+
+
+    // ---------------------------------------------------------------------------------------------
+    // RECEIVE METHODS
+
+    // ...
+
+
+    // ---------------------------------------------------------------------------------------------
 
 
 
@@ -174,18 +275,13 @@ class MqClient(val login: MqLogin) {
 
 
 
+
+
+
     /**
      * FOR TESTING ONLY! *********************************************************************************************
-     * Remove this function when finished
+     * Remove these functions when finished
      */
-
-
-
-
-
-
-
-
 
 
 

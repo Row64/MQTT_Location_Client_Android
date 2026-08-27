@@ -46,6 +46,14 @@ class ViewModelPrimary : ViewModel() {
     lateinit var mqClient: MqClient
 
 
+    /**
+     * This method completes a basic input validation and attempts to establish a
+     * connection to a broker. If the input validation fails, a custom exception
+     * (MqCredentialException) is thrown, and the method ends.
+     *
+     * If the input validation passes, the method attempts to establish a connection
+     * to the broker.
+     */
     fun tryConnect() {
 
         try {
@@ -60,9 +68,9 @@ class ViewModelPrimary : ViewModel() {
             disconnectBtnEnabled = true
             loginFieldEnabled = false
 
-            // Attempt to connect
-            var client = MqClient(mqLogin)
-            client.mqConnectAndSend3()
+            // Initialize client and attempt to connect
+            mqClient = MqClient(mqLogin)
+            mqClient.mqConnect()
 
         }
         catch(e: MqCredentialException) {
@@ -95,7 +103,6 @@ class ViewModelPrimary : ViewModel() {
             || inputPort.value.equals(""))
         {
             // Make fields show error indicator
-//            toggleFieldError(true)
             loginFieldError = true
 
             throw MqCredentialException(
@@ -106,7 +113,6 @@ class ViewModelPrimary : ViewModel() {
         else {
 
             // Remove error visual in case it had been enabled from a previous failed check
-//            toggleFieldError(false)
             loginFieldError = false
 
             // Convert the port entry into an Int
@@ -154,6 +160,23 @@ class ViewModelPrimary : ViewModel() {
 
 
 
+
+    // FOR TESTINGS
+    fun sendTestMessage() {
+
+        try {
+            mqClient.mqPublish3("TEST", "Test message from client".toByteArray())
+        }
+        catch(e: UninitializedPropertyAccessException) {
+            // For when a message is sent before the client object is initialized.
+            // The client is initialized in tryConnect()
+
+            println("Could not send message because the client is not yet initialized. Try connecting first.")
+        }
+    }
+
+
+
     // ---------------------------------------------------------------------------------------------
     // UI METHODS
 
@@ -177,6 +200,7 @@ class ViewModelPrimary : ViewModel() {
     }
 
     // ---------------------------------------------------------------------------------------------
+
 
 
 }

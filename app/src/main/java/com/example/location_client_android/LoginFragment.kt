@@ -192,15 +192,6 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                             "\nUser: ${stateUser.text}" +
                             "\nPass: ${statePass.text}")
 
-//                // FOR TESTING
-//                println("Before assignment:")
-//                viewModel.print()
-////            viewModel.mqHost = stateHost.text.toString()
-//                viewModel.mqHost.value = stateHost.text.toString()
-//                println("After assignment:")
-//                viewModel.print()
-
-
                     // Send login data to the view model
                     viewModel.inputHost.value = stateHost.text.toString()
                     viewModel.inputPort.value = statePort.text.toString()
@@ -208,6 +199,7 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                     viewModel.inputPass.value = statePass.text.toString()
 
                     // Attempt the connection to the MQTT broker
+                    // Also completes a basic input validation check
                     viewModel.tryConnect()
 
                 },
@@ -254,6 +246,16 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
         Text(
             text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
         )
+
+        // Test send message
+        // FOR TESTING
+        Button(
+            onClick = {
+                viewModel.sendTestMessage()
+            }
+        ) {
+            Text("Test message")
+        }
 
 
     }
