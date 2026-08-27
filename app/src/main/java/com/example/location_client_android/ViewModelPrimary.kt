@@ -70,7 +70,11 @@ class ViewModelPrimary : ViewModel() {
 
             // Initialize client and attempt to connect
             mqClient = MqClient(mqLogin)
-            mqClient.mqConnect()
+            if (!mqClient.mqConnect()) { // If connection fails, reset UI
+                connectBtnEnabled = true
+                loginFieldEnabled = true
+                disconnectBtnEnabled = false
+            }
 
         }
         catch(e: MqCredentialException) {
@@ -122,12 +126,14 @@ class ViewModelPrimary : ViewModel() {
 
                 // Ensure port is within valid range
                 if (!(portInt in 1..65535)) {
-                    throw MqCredentialException("Provided port number is out of range. Valid range is: 1 - 65,535")
+                    throw MqCredentialException("Provided port number is out of range." +
+                            "Valid range is: 1 - 65,535")
                 }
 
             }
             catch(e: NumberFormatException) {
-                throw MqCredentialException("Port must be a positive integer within the range of 1 to 65,535.")
+                throw MqCredentialException("Port must be a positive integer within the range of" +
+                        "1 to 65,535.")
             }
 
             // Assign required user inputs to MqLogin object
@@ -161,7 +167,7 @@ class ViewModelPrimary : ViewModel() {
 
 
 
-    // FOR TESTINGS
+    // FOR TESTING
     fun sendTestMessage() {
 
         try {
@@ -171,8 +177,15 @@ class ViewModelPrimary : ViewModel() {
             // For when a message is sent before the client object is initialized.
             // The client is initialized in tryConnect()
 
-            println("Could not send message because the client is not yet initialized. Try connecting first.")
+            println("Could not send message because the client is not yet initialized." +
+                    "Try connecting first.")
         }
+    }
+
+
+    // Disconnect from the broker
+    fun disconnectFromBroker() {
+        mqClient.disconnectAll()
     }
 
 

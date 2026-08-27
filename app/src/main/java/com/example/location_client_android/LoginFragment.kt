@@ -216,10 +216,12 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
                 onClick = {
 
                     // Disconnect from server or cancel connection attempt
-                    // ...
+                    viewModel.disconnectFromBroker()
 
                     // Reset UI state
-                    // ...
+                    viewModel.toggleConnectBtn(true)
+                    viewModel.toggleLoginFieldEnabled(true)
+                    viewModel.toggleDisconnectBtn(false)
 
                 },
                 enabled = viewModel.disconnectBtnEnabled

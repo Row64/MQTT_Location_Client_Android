@@ -64,7 +64,7 @@ class MqClient(val login: MqLogin) {
      *  A truly failed connection occurs only if the client fails to connect to the broker
      *  with both version 5 and 3.1.1.
      */
-    fun mqConnect() {
+    fun mqConnect(): Boolean {
 
         // How to identify a failed connection?
         // Does it throw an exception?
@@ -72,8 +72,32 @@ class MqClient(val login: MqLogin) {
         // Maybe have the connect method throw a custom exception if it cannot connect,
         // triggering the attempt to try the next MQTT version
 
-        mqConnect3()
+        /**
+         * This is not working. I think it's because, in version 3, I'm trying
+         * to throw an exception from an asynchronous function, when the main
+         * thread has moved past it -?
+         */
 
+        try {
+            mqConnect5()
+        }
+        catch (e: MqFailedConnection5Exception) {
+            println("Caught MqFailedConnection5Exception")
+            println("Attempting to connect with version 3.1.1...")
+
+            try {
+                mqConnect3()
+            }
+            catch (e: MqFailedConnection3Exception) {
+                println("Caught MqFailedConnection3Exception")
+                println("Total connection failure.")
+                return false
+            }
+
+        }
+
+        // Successful connection
+        return true
     }
 
 
@@ -94,12 +118,7 @@ class MqClient(val login: MqLogin) {
                 // For failure
                 if (throwable != null) {
                     println("Connection failed")
-
-                    // Reset the UI
-                    // ...
-
-
-
+                    throw MqFailedConnection3Exception("")
                 }
                 // For success
                 else {
@@ -123,6 +142,7 @@ class MqClient(val login: MqLogin) {
     private fun mqConnect5() {
         // ...
         println("Error: Method 'mqConnect5' is not yet implemented...")
+        throw MqFailedConnection5Exception("")
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -152,6 +172,14 @@ class MqClient(val login: MqLogin) {
     }
 
 
+    fun mqPublish5() {
+
+
+        // ...
+
+    }
+
+
 
     // ---------------------------------------------------------------------------------------------
     // RECEIVE METHODS
@@ -160,8 +188,22 @@ class MqClient(val login: MqLogin) {
 
 
     // ---------------------------------------------------------------------------------------------
+    // DISCONNECT
+
+    fun disconnectAll() {
+        client3.disconnect()
+        client5.disconnect()
+    }
 
 
+
+
+
+
+    // ---------------------------------------------------------------------------------------------
+
+
+    // TESTING
 
     /**
      * Connect to the broker using MQTT version 3.1.1
