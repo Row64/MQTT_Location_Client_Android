@@ -5,6 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.jetbrains.annotations.Async
 
 class ViewModelPrimary : ViewModel() {
 
@@ -59,6 +63,7 @@ class ViewModelPrimary : ViewModel() {
         try {
 
             // Basic input validation and assign user input to MqLogin object
+            // Throws MqCredentialException for credential-related issues
             setCredentials()
 
             // Disable the Connect button starting after the basic credentials check
@@ -68,13 +73,30 @@ class ViewModelPrimary : ViewModel() {
             disconnectBtnEnabled = true
             loginFieldEnabled = false
 
-            // Initialize client and attempt to connect
+            // Initialize client
             mqClient = MqClient(mqLogin)
-            if (!mqClient.mqConnect()) { // If connection fails, reset UI
-                connectBtnEnabled = true
-                loginFieldEnabled = true
-                disconnectBtnEnabled = false
+
+
+            // ATTEMPT TO CONNECT
+            // Maybe wrap the connection attempt in some kind of async block?
+            // Try a coroutine?
+
+            CoroutineScope(Dispatchers.IO).launch {
+                mqClient.mqConnect()
+
+                // FOR TESTING
+//                println("Connection result: " + result)
             }
+
+
+
+//            if (!mqClient.mqConnect()) { // If connection fails, reset UI
+//                connectBtnEnabled = true
+//                loginFieldEnabled = true
+//                disconnectBtnEnabled = false
+//            }
+//
+//            var result = mqClient.mqConnect().await()
 
         }
         catch(e: MqCredentialException) {
@@ -171,7 +193,7 @@ class ViewModelPrimary : ViewModel() {
     fun sendTestMessage() {
 
         try {
-            mqClient.mqPublish3("TEST", "Test message from client".toByteArray())
+            mqClient.mqPublish("TEST", "Test message from client".toByteArray())
         }
         catch(e: UninitializedPropertyAccessException) {
             // For when a message is sent before the client object is initialized.

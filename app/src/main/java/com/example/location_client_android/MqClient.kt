@@ -4,8 +4,17 @@
  * https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-hivemq-mqtt-client/
  */
 
+
+/**
+ * IMPLEMENTATION GOALS
+ *
+ *  - Need to add support for no authentication
+ */
+
+
 package com.example.location_client_android
 
+import com.google.android.gms.tasks.Tasks.await
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
@@ -39,8 +48,11 @@ class MqClient(val login: MqLogin) {
         .buildAsync()
 
     // Async connection status variables
-    lateinit private var connAck3: CompletableFuture<Mqtt3ConnAck>
-    lateinit private var connAck5: CompletableFuture<Mqtt5ConnAck>
+//    lateinit private var connAck3: CompletableFuture<Mqtt3ConnAck>
+//    lateinit private var connAck5: CompletableFuture<Mqtt5ConnAck>
+
+    // Tracks the determined MQTT verison
+    lateinit private var mqVersion: String
 
     // ---------------------------------------------------------------------------------------------
     // CONNECT METHODS
@@ -64,49 +76,64 @@ class MqClient(val login: MqLogin) {
      *  A truly failed connection occurs only if the client fails to connect to the broker
      *  with both version 5 and 3.1.1.
      */
-    fun mqConnect(): Boolean {
 
-        // How to identify a failed connection?
-        // Does it throw an exception?
+//    fun mqConnect() {
+//
+//        try {
+//            mqConnect5()
+//        }
+//        catch (e: MqFailedConnection5Exception) {
+//            println("Caught MqFailedConnection5Exception")
+//            println("Attempting to connect with version 3.1.1")
+//            mqConnect3()
+//        }
+//        catch (e: MqFailedConnection3Exception) {
+//            println("Caught MqFailedConnection3Exception")
+//            println("Connection attempt failed")
+//
+//            // Throw exception to ViewModelPrimary that indicates the connection attempt failed
+//            // so that the UI can be reset
+//        }
+//
+//
+//    }
 
-        // Maybe have the connect method throw a custom exception if it cannot connect,
-        // triggering the attempt to try the next MQTT version
 
-        /**
-         * This is not working. I think it's because, in version 3, I'm trying
-         * to throw an exception from an asynchronous function, when the main
-         * thread has moved past it -?
-         */
+    fun mqConnect() {
 
-        try {
-            mqConnect5()
-        }
-        catch (e: MqFailedConnection5Exception) {
-            println("Caught MqFailedConnection5Exception")
-            println("Attempting to connect with version 3.1.1...")
+        println("Attempting to connect with version 5 using basic authentication")
 
-            try {
-                mqConnect3()
+        client5.connectWith()
+            .simpleAuth()
+            .username(login.user!!)
+            .password(login.pass!!.toByteArray())
+            .applySimpleAuth()
+            .send()
+            .whenCompleteAsync { _, throwable ->
+                // For failure
+                if (throwable != null) {
+                    println("v5 connection failed")
+
+                    // Try to connect with v3 if v5 fails
+                    mqConnect3()
+                }
+                // For success
+                else {
+                    println("Successfully connected with v5")
+                    mqVersion = "v5"
+                }
+
             }
-            catch (e: MqFailedConnection3Exception) {
-                println("Caught MqFailedConnection3Exception")
-                println("Total connection failure.")
-                return false
-            }
 
-        }
-
-        // Successful connection
-        return true
+        // FOR TESTING
+        println("End of mqConnect()")
     }
-
 
 
     private fun mqConnect3() {
 
         println("Got to mqConnect3()")
-
-        println("Attempting to connect with version 3 using basic authentication...")
+        println("Attempting to connect with version 3 using basic authentication")
 
         client3.connectWith()
             .simpleAuth()
@@ -117,33 +144,47 @@ class MqClient(val login: MqLogin) {
             .whenCompleteAsync { _, throwable ->
                 // For failure
                 if (throwable != null) {
-                    println("Connection failed")
+                    println("v3 connection failed")
                     throw MqFailedConnection3Exception("")
+                    mqVersion = "ERROR"
                 }
                 // For success
                 else {
-                    println("Connection was successful")
-
-                    // Enable send button
-                    // ...
-
+                    println("Successfully connected with v3")
+                    mqVersion = "v3"
                 }
 
             }
 
-
-
-
     }
 
 
+//    private fun mqConnect5() {
+//
+//        println("Got to mqConnect3()")
+//        println("Attempting to connect with version 5 using basic authentication...")
+//
+//        client5.connectWith()
+//            .simpleAuth()
+//            .username(login.user!!)
+//            .password(login.pass!!.toByteArray())
+//            .applySimpleAuth()
+//            .send()
+//            .whenCompleteAsync { _, throwable ->
+//                // For failure
+//                if (throwable != null) {
+//                    println("v5 connection failed")
+//                    throw MqFailedConnection5Exception("")
+//                }
+//                // For success
+//                else {
+//                    println("Successfully connected with v5")
+//                }
+//
+//            }
+//    }
 
 
-    private fun mqConnect5() {
-        // ...
-        println("Error: Method 'mqConnect5' is not yet implemented...")
-        throw MqFailedConnection5Exception("")
-    }
 
     // ---------------------------------------------------------------------------------------------
     // PUBLISH METHODS
@@ -151,8 +192,22 @@ class MqClient(val login: MqLogin) {
 
     // ...
 
+    // MUST USE THE RIGHT PUBLISH METHOD FOR WHICHEVER CONNECTION VERSION WORKS!
+    // Maybe I need a variable that stores the selected version? How to do this with async?
 
-    fun mqPublish3(topic: String, payload: ByteArray) {
+    fun mqPublish(topic: String, payload: ByteArray) {
+
+        // Call publish message version based on determined MQTT connection version
+        when (mqVersion) {
+            "v5"    -> mqPublish5(topic, payload)
+            "v3"    -> mqPublish3(topic, payload)
+            else    -> mqPublish5(topic, payload) // The publish method will print an error when not connected
+        }
+
+    }
+
+
+    private fun mqPublish3(topic: String, payload: ByteArray) {
         client3.publishWith()
             .topic(topic)
             .payload(payload)
@@ -172,32 +227,40 @@ class MqClient(val login: MqLogin) {
     }
 
 
-    fun mqPublish5() {
-
-
-        // ...
-
+    private fun mqPublish5(topic: String, payload: ByteArray) {
+        client5.publishWith()
+            .topic(topic)
+            .payload(payload)
+            .qos(MqttQos.EXACTLY_ONCE)
+            .send()
+            .whenComplete { publish, throwable ->
+                // For error
+                if (throwable != null) {
+                    println("Failed to send message")
+                    println(throwable.message)
+                }
+                // For success
+                else {
+                    println("Message sent")
+                }
+            }
     }
-
 
 
     // ---------------------------------------------------------------------------------------------
     // RECEIVE METHODS
 
-    // ...
+    // (This app does not currently need to receive messages from a broker)
 
 
     // ---------------------------------------------------------------------------------------------
     // DISCONNECT
 
+
     fun disconnectAll() {
         client3.disconnect()
         client5.disconnect()
     }
-
-
-
-
 
 
     // ---------------------------------------------------------------------------------------------
