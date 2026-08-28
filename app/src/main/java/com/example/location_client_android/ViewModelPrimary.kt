@@ -76,10 +76,9 @@ class ViewModelPrimary : ViewModel() {
             // Initialize client
             mqClient = MqClient(mqLogin)
 
-
             // Attempt to connect
             // Connect methods are blocking, so they needed to be encapsulated in a coroutine
-            // to not freeze the applicaiton, but to allow a linear flow
+            // to not freeze the application, but to allow a linear flow
             CoroutineScope(Dispatchers.IO).launch {
 
                 val connectionResult: Boolean = mqClient.mqConnectBlocking()
@@ -89,20 +88,17 @@ class ViewModelPrimary : ViewModel() {
                     connectBtnEnabled = true
                     disconnectBtnEnabled = false
                     loginFieldEnabled = true
+
+                    // UPDATE CONNECTION STATUS INDICATOR UI (Fail)
+                    // ...
                 }
 
                 println("Reached end of coroutine")
+
+                // UPDATE CONNECTION STATUS INDICATOR UI (Success)
+                // ...
+
             }
-
-
-
-//            if (!mqClient.mqConnect()) { // If connection fails, reset UI
-//                connectBtnEnabled = true
-//                loginFieldEnabled = true
-//                disconnectBtnEnabled = false
-//            }
-//
-//            var result = mqClient.mqConnect().await()
 
         }
         catch(e: MqCredentialException) {
@@ -111,16 +107,12 @@ class ViewModelPrimary : ViewModel() {
             // Host and Port are required. Port must be an integer.
 
             println(e.message)
-//            toggleFieldError(true)
             loginFieldError = true
 
-            // NOTIFY USER
+            // UPDATE CONNECTION STATUS INDICATOR UI (Bad credential formatting)
             // ...
 
-            return
-
         }
-
     }
 
     /**
@@ -198,16 +190,23 @@ class ViewModelPrimary : ViewModel() {
     // FOR TESTING
     fun sendTestMessage() {
 
-        try {
-            mqClient.mqPublish("TEST", "Test message from client".toByteArray())
-        }
-        catch(e: UninitializedPropertyAccessException) {
-            // For when a message is sent before the client object is initialized.
-            // The client is initialized in tryConnect()
+        CoroutineScope(Dispatchers.IO).launch {
 
-            println("Could not send message because the client is not yet initialized." +
-                    "Try connecting first.")
+            try {
+                mqClient.mqPublishBlocking("TEST", "Test message from client".toByteArray())
+            }
+            catch (e: UninitializedPropertyAccessException) {
+                // For when a message is sent before the client object is initialized.
+                // The client is initialized in tryConnect()
+
+                println(
+                    "Could not send message because the client is not yet initialized. " +
+                            "Try connecting first."
+                )
+            }
+
         }
+
     }
 
 

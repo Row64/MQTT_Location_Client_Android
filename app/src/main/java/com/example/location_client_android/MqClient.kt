@@ -91,7 +91,6 @@ class MqClient(val login: MqLogin) {
      * prevent these blocking methods from halting the main application thread, I wrapped the call
      * in a coroutine in the view model.
      */
-
     fun mqConnectBlocking(): Boolean {
 
         println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
@@ -146,8 +145,6 @@ class MqClient(val login: MqLogin) {
         println(connAck5)
         return true
     }
-
-
 
 
 //    fun mqConnect() {
@@ -240,66 +237,108 @@ class MqClient(val login: MqLogin) {
     // ---------------------------------------------------------------------------------------------
     // PUBLISH METHODS
 
+    /**
+     * This method selects which protocol to use based on the protocol version previously
+     * identified in the connection (assuming a connection was attempted prior to calling).
+     *
+     * These publish methods are blocking, so they need to be encapsulated in a coroutine
+     * in the view model, which calls them.
+     */
+    fun mqPublishBlocking(topic: String, payload: ByteArray) {
 
-    // ...
-
-    // MUST USE THE RIGHT PUBLISH METHOD FOR WHICHEVER CONNECTION VERSION WORKS!
-    // Maybe I need a variable that stores the selected version? How to do this with async?
-
-    // CURRENTLY ONLY WORKING WITH ASYNC METHODS!
-    // NEED BLOCKING VERSION (?)
-    // Wrap blocking version in coroutine in ViewModelPrimary (?)
-
-    fun mqPublish(topic: String, payload: ByteArray) {
-
-        // Call publish message version based on determined MQTT connection version
+        // Call publish method based on determined MQTT connection version
         when (mqVersion) {
-            "v5"    -> mqPublish5(topic, payload)
-            "v3"    -> mqPublish3(topic, payload)
-            else    -> mqPublish5(topic, payload) // The publish method will print an error when not connected
+            "v5"    -> mqPublish5Blocking(topic, payload)
+            "v3"    -> mqPublish3Blocking(topic, payload)
+            else    -> mqPublish5Blocking(topic, payload) // The publish method will print an error when not connected
         }
+    }
 
+    // Send a message using MQTT 3.1.1
+    private fun mqPublish3Blocking(topic: String, payload: ByteArray) {
+        try {
+            client3Blocking.publishWith()
+                .topic(topic)
+                .payload(payload)
+                .qos(MqttQos.EXACTLY_ONCE)
+                .send()
+
+            println("Sent message with version 3")
+        }
+        catch (e: Exception) {
+            println("Caught exception when trying to send message with version 3")
+            println(e.message)
+        }
+    }
+
+    // Send a message using MQTT 5
+    private fun mqPublish5Blocking(topic: String, payload: ByteArray) {
+        try {
+            client5Blocking.publishWith()
+                .topic(topic)
+                .payload(payload)
+                .qos(MqttQos.EXACTLY_ONCE)
+                .send()
+
+            println("Sent message with version 5")
+        }
+        catch (e: Exception) {
+            println("Caught exception when trying to send message with version 5")
+            println(e.message)
+        }
     }
 
 
-    private fun mqPublish3(topic: String, payload: ByteArray) {
-        client3.publishWith()
-            .topic(topic)
-            .payload(payload)
-            .qos(MqttQos.EXACTLY_ONCE)
-            .send()
-            .whenComplete { publish, throwable ->
-                // For error
-                if (throwable != null) {
-                    println("Failed to send message")
-                    println(throwable.message)
-                }
-                // For success
-                else {
-                    println("Message sent")
-                }
-            }
-    }
-
-
-    private fun mqPublish5(topic: String, payload: ByteArray) {
-        client5.publishWith()
-            .topic(topic)
-            .payload(payload)
-            .qos(MqttQos.EXACTLY_ONCE)
-            .send()
-            .whenComplete { publish, throwable ->
-                // For error
-                if (throwable != null) {
-                    println("Failed to send message")
-                    println(throwable.message)
-                }
-                // For success
-                else {
-                    println("Message sent")
-                }
-            }
-    }
+//    fun mqPublish(topic: String, payload: ByteArray) {
+//
+//        // Call publish message version based on determined MQTT connection version
+//        when (mqVersion) {
+//            "v5"    -> mqPublish5(topic, payload)
+//            "v3"    -> mqPublish3(topic, payload)
+//            else    -> mqPublish5(topic, payload) // The publish method will print an error when not connected
+//        }
+//
+//    }
+//
+//
+//    private fun mqPublish3(topic: String, payload: ByteArray) {
+//        client3.publishWith()
+//            .topic(topic)
+//            .payload(payload)
+//            .qos(MqttQos.EXACTLY_ONCE)
+//            .send()
+//            .whenComplete { publish, throwable ->
+//                // For error
+//                if (throwable != null) {
+//                    println("Failed to send message")
+//                    println(throwable.message)
+//                }
+//                // For success
+//                else {
+//                    println("Message sent")
+//                }
+//            }
+//    }
+//
+//
+//    private fun mqPublish5(topic: String, payload: ByteArray) {
+//        client5.publishWith()
+//            .topic(topic)
+//            .payload(payload)
+//            .qos(MqttQos.EXACTLY_ONCE)
+//            .send()
+//            .whenComplete { publish, throwable ->
+//                // For error
+//                if (throwable != null) {
+//                    println("Failed to send message")
+//                    println(throwable.message)
+//                }
+//                // For success
+//                else {
+//                    println("Message sent")
+//                }
+//            }
+//    }
 
 
     // ---------------------------------------------------------------------------------------------
@@ -313,14 +352,35 @@ class MqClient(val login: MqLogin) {
 
 
     fun disconnectAll() {
+
         client3.disconnect()
         client5.disconnect()
+
+        // Blocking clients throw an exception if a disconnect attempt is made when not connected
+        try {
+            client5Blocking.disconnect()
+        }
+        catch (e: Exception) {
+            println("Caught exception when disconnecting from v5")
+            println(e.message)
+            println(e.cause)
+        }
+
+        try {
+            client3Blocking.disconnect()
+        }
+        catch (e: Exception) {
+            println("Caught exception when disconnecting from v3")
+            println(e.message)
+            println(e.cause)
+        }
+
+        println("Completed disconnect")
+
     }
 
 
     // ---------------------------------------------------------------------------------------------
-
-
     // TESTING
 
     /**
