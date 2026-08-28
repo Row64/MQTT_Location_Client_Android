@@ -20,6 +20,7 @@ import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
 import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
+import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -46,6 +47,18 @@ class MqClient(val login: MqLogin) {
         .serverPort(login.port)
         .sslWithDefaultConfig()
         .buildAsync()
+
+
+    // BLOCKING CLIENT
+    // FOR TESTING
+    private var client5Blocking = MqttClient.builder()
+        .useMqttVersion5()
+        .identifier(UUID.randomUUID().toString())
+        .serverHost(login.host)
+        .serverPort(login.port)
+        .sslWithDefaultConfig()
+        .buildBlocking()
+
 
     // Async connection status variables
 //    lateinit private var connAck3: CompletableFuture<Mqtt3ConnAck>
@@ -97,6 +110,37 @@ class MqClient(val login: MqLogin) {
 //
 //
 //    }
+
+
+    // FOR TESTING
+    fun mqConnectBlocking(): Boolean {
+
+        println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
+
+        // Blocking connect throws an exception if the connection fails
+        try {
+            val connAckMessage: Mqtt5ConnAck = client5Blocking.connectWith()
+                .simpleAuth()
+                .username(login.user!!)
+                .password(login.pass!!.toByteArray())
+                .applySimpleAuth()
+                .send()
+        }
+        catch (e: Exception) {
+            println("Exception caught when trying to connect:")
+            println(e.cause)
+            println(e.message)
+            return false
+        }
+
+        mqVersion = "v5"
+
+        println("Reached end of connection attempt")
+
+        return true
+    }
+
+
 
 
     fun mqConnect() {
@@ -194,6 +238,10 @@ class MqClient(val login: MqLogin) {
 
     // MUST USE THE RIGHT PUBLISH METHOD FOR WHICHEVER CONNECTION VERSION WORKS!
     // Maybe I need a variable that stores the selected version? How to do this with async?
+
+    // CURRENTLY ONLY WORKING WITH ASYNC METHODS!
+    // NEED BLOCKING VERSION (?)
+    // Wrap blocking version in coroutine in ViewModelPrimary (?)
 
     fun mqPublish(topic: String, payload: ByteArray) {
 
