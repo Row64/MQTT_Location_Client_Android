@@ -77,17 +77,11 @@ class ViewModelPrimary : ViewModel() {
             mqClient = MqClient(mqLogin)
 
 
-            // ATTEMPT TO CONNECT
-            // Maybe wrap the connection attempt in some kind of async block?
-            // Try a coroutine?
-
+            // Attempt to connect
+            // Connect methods are blocking, so they needed to be encapsulated in a coroutine
+            // to not freeze the applicaiton, but to allow a linear flow
             CoroutineScope(Dispatchers.IO).launch {
 
-
-                /**
-                 * Try to use a blocking connection method so that this block completes sequentially.
-                 * But, wrap it in a coroutine so that it doesn't halt the application.
-                 */
                 val connectionResult: Boolean = mqClient.mqConnectBlocking()
 
                 // Reset the UI if a connection attempt fails
@@ -97,8 +91,6 @@ class ViewModelPrimary : ViewModel() {
                     loginFieldEnabled = true
                 }
 
-                // FOR TESTING
-//                println("Connection result: " + result)
                 println("Reached end of coroutine")
             }
 

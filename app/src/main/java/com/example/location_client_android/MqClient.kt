@@ -48,9 +48,16 @@ class MqClient(val login: MqLogin) {
         .sslWithDefaultConfig()
         .buildAsync()
 
+    // Blocking MQTT 3 client
+    private var client3Blocking = MqttClient.builder()
+        .useMqttVersion3()
+        .identifier(UUID.randomUUID().toString())
+        .serverHost(login.host)
+        .serverPort(login.port)
+        .sslWithDefaultConfig()
+        .buildBlocking()
 
-    // BLOCKING CLIENT
-    // FOR TESTING
+    // Blocking MQTT 5 client
     private var client5Blocking = MqttClient.builder()
         .useMqttVersion5()
         .identifier(UUID.randomUUID().toString())
@@ -58,11 +65,6 @@ class MqClient(val login: MqLogin) {
         .serverPort(login.port)
         .sslWithDefaultConfig()
         .buildBlocking()
-
-
-    // Async connection status variables
-//    lateinit private var connAck3: CompletableFuture<Mqtt3ConnAck>
-//    lateinit private var connAck5: CompletableFuture<Mqtt5ConnAck>
 
     // Tracks the determined MQTT verison
     lateinit private var mqVersion: String
@@ -73,53 +75,33 @@ class MqClient(val login: MqLogin) {
     /**
      * This is the primary connection method used.
      *
-     * This method cansists of two supporting methods:
-     *  - mqConnect5()
-     *  - mqConnect3()
+     * The HiveMQ Client library does not include automatic fallback features. So,
+     * if you try to use a v5 client and connect to a v3.1.1 broker, the connection
+     * will fail, and the client will not automatically fall back to v3.
      *
-     *  The HiveMQ Client library does not include automatic fallback features. So,
-     *  if you try to use a v5 client and connect to a v3.1.1 broker, the connection
-     *  will fail, and the client will not automatically fall back to v3.
+     * To handle this, in this method, I first attempt to connect to a broker using the
+     * v5 client. If this connection attempt fails, then mqConnect() will attempt the same
+     * connection using the v3 client.
      *
-     *  To handle this, in this mqConnect() method, I first attempt to connect to a
-     *  broker using the v5 client, calling the mqConnect5() client. If this connection
-     *  attempt fails, then mqConnect() will attempt the same connection using the v3
-     *  client, calling mqConnect3()
+     * A truly failed connection occurs only if the client fails to connect to the broker
+     * with both version 5 and 3.1.1.
      *
-     *  A truly failed connection occurs only if the client fails to connect to the broker
-     *  with both version 5 and 3.1.1.
+     * I used the blocking connect methods in order to force the logic to flow linearly, so that
+     * I could track the connection status and update the UI accordingly in the view model. To
+     * prevent these blocking methods from halting the main application thread, I wrapped the call
+     * in a coroutine in the view model.
      */
 
-//    fun mqConnect() {
-//
-//        try {
-//            mqConnect5()
-//        }
-//        catch (e: MqFailedConnection5Exception) {
-//            println("Caught MqFailedConnection5Exception")
-//            println("Attempting to connect with version 3.1.1")
-//            mqConnect3()
-//        }
-//        catch (e: MqFailedConnection3Exception) {
-//            println("Caught MqFailedConnection3Exception")
-//            println("Connection attempt failed")
-//
-//            // Throw exception to ViewModelPrimary that indicates the connection attempt failed
-//            // so that the UI can be reset
-//        }
-//
-//
-//    }
-
-
-    // FOR TESTING
     fun mqConnectBlocking(): Boolean {
 
         println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
 
+        val connAck5: Mqtt5ConnAck
+        val connAck3: Mqtt3ConnAck
+
         // Blocking connect throws an exception if the connection fails
         try {
-            val connAckMessage: Mqtt5ConnAck = client5Blocking.connectWith()
+            connAck5 = client5Blocking.connectWith()
                 .simpleAuth()
                 .username(login.user!!)
                 .password(login.pass!!.toByteArray())
@@ -127,82 +109,107 @@ class MqClient(val login: MqLogin) {
                 .send()
         }
         catch (e: Exception) {
+            println("Failed to connect using v5")
             println("Exception caught when trying to connect:")
-            println(e.cause)
             println(e.message)
-            return false
+
+            println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+
+            // Try to connect with v3 if v5 fails
+            try {
+                connAck3 = client3Blocking.connectWith()
+                    .simpleAuth()
+                    .username(login.user!!)
+                    .password(login.pass!!.toByteArray())
+                    .applySimpleAuth()
+                    .send()
+            }
+            catch (e: Exception) {
+
+                println("Failed to connect using v3")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("Cannot connect to client.")
+                return false
+            }
+
+            println("Successfully connected using version 3")
+            println(connAck3)
+            mqVersion = "v3"
+            return true
+
         }
 
+        println("Successfully connected using version 5")
         mqVersion = "v5"
-
-        println("Reached end of connection attempt")
-
+        println(connAck5)
         return true
     }
 
 
 
 
-    fun mqConnect() {
-
-        println("Attempting to connect with version 5 using basic authentication")
-
-        client5.connectWith()
-            .simpleAuth()
-            .username(login.user!!)
-            .password(login.pass!!.toByteArray())
-            .applySimpleAuth()
-            .send()
-            .whenCompleteAsync { _, throwable ->
-                // For failure
-                if (throwable != null) {
-                    println("v5 connection failed")
-
-                    // Try to connect with v3 if v5 fails
-                    mqConnect3()
-                }
-                // For success
-                else {
-                    println("Successfully connected with v5")
-                    mqVersion = "v5"
-                }
-
-            }
-
-        // FOR TESTING
-        println("End of mqConnect()")
-    }
-
-
-    private fun mqConnect3() {
-
-        println("Got to mqConnect3()")
-        println("Attempting to connect with version 3 using basic authentication")
-
-        client3.connectWith()
-            .simpleAuth()
-            .username(login.user!!)
-            .password(login.pass!!.toByteArray())
-            .applySimpleAuth()
-            .send()
-            .whenCompleteAsync { _, throwable ->
-                // For failure
-                if (throwable != null) {
-                    println("v3 connection failed")
-                    throw MqFailedConnection3Exception("")
-                    mqVersion = "ERROR"
-                }
-                // For success
-                else {
-                    println("Successfully connected with v3")
-                    mqVersion = "v3"
-                }
-
-            }
-
-    }
-
-
+//    fun mqConnect() {
+//
+//        println("Attempting to connect with version 5 using basic authentication")
+//
+//        client5.connectWith()
+//            .simpleAuth()
+//            .username(login.user!!)
+//            .password(login.pass!!.toByteArray())
+//            .applySimpleAuth()
+//            .send()
+//            .whenCompleteAsync { _, throwable ->
+//                // For failure
+//                if (throwable != null) {
+//                    println("v5 connection failed")
+//
+//                    // Try to connect with v3 if v5 fails
+//                    mqConnect3()
+//                }
+//                // For success
+//                else {
+//                    println("Successfully connected with v5")
+//                    mqVersion = "v5"
+//                }
+//
+//            }
+//
+//        // FOR TESTING
+//        println("End of mqConnect()")
+//    }
+//
+//
+//    private fun mqConnect3() {
+//
+//        println("Got to mqConnect3()")
+//        println("Attempting to connect with version 3 using basic authentication")
+//
+//        client3.connectWith()
+//            .simpleAuth()
+//            .username(login.user!!)
+//            .password(login.pass!!.toByteArray())
+//            .applySimpleAuth()
+//            .send()
+//            .whenCompleteAsync { _, throwable ->
+//                // For failure
+//                if (throwable != null) {
+//                    println("v3 connection failed")
+//                    throw MqFailedConnection3Exception("")
+//                    mqVersion = "ERROR"
+//                }
+//                // For success
+//                else {
+//                    println("Successfully connected with v3")
+//                    mqVersion = "v3"
+//                }
+//
+//            }
+//
+//    }
+//
+//
 //    private fun mqConnect5() {
 //
 //        println("Got to mqConnect3()")
