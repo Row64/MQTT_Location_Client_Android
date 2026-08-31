@@ -16,6 +16,8 @@
     <!--Text used on the login screen-->
     <string name="login_screen_title">Connect to a Broker</string>
     <string name="connect_btn_connect">Connect</string>
-    <string name="disconnect_btn_cancel">Cancel</string>
+    <string name="disconnect_btn_cancel">Disconnect</string>
+
+    <string name="location_message_topic">LOCATION_UPDATE</string>
 
 </resources>

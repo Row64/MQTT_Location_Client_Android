@@ -48,9 +48,7 @@ import kotlin.getValue
 
 class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
-    // TESTING *********************
-    // ShareViewModel
-//    val model = ViewModelProvider(requireActivity()).get(ViewModelPrimary::class.java)
+    // ViewModel instance
     private val viewModel: ViewModelPrimary by activityViewModels()
 
 
@@ -104,6 +102,8 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
     ) {
 
         // UI components
+
+
         Title()
 //        FieldHost()
 //        FieldPort()
@@ -251,13 +251,15 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 
         // Test send message
         // FOR TESTING
-        Button(
-            onClick = {
-                viewModel.sendTestMessage()
-            }
-        ) {
-            Text("Test message")
-        }
+//        Button(
+//            onClick = {
+//
+//                // FOR TESTING
+//                viewModel.sendTestMessage()
+//            }
+//        ) {
+//            Text("Send location updates")
+//        }
 
 
     }

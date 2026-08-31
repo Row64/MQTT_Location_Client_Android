@@ -34,6 +34,9 @@ class ViewModelPrimary : ViewModel() {
     var loginFieldEnabled by mutableStateOf(true)
         private set
 
+//    var locationButtonEnabled by mutableStateOf(true)
+//        private set
+
 
 
     // Raw user input variables
@@ -188,12 +191,12 @@ class ViewModelPrimary : ViewModel() {
 
 
     // FOR TESTING
-    fun sendTestMessage() {
+    fun sendMessage(topic: String, payload: ByteArray) {
 
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
-                mqClient.mqPublishBlocking("TEST", "Test message from client".toByteArray())
+                mqClient.mqPublishBlocking(topic, payload)
             }
             catch (e: UninitializedPropertyAccessException) {
                 // For when a message is sent before the client object is initialized.

@@ -27,6 +27,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
@@ -35,6 +36,11 @@ private const val TAG = "MainActivity"
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
 
 class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    // ViewModel instance
+    private val viewModel: ViewModelPrimary by activityViewModels()
+
+
 
     private var locationServiceForegroundBound = false
 
@@ -86,17 +92,6 @@ class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
          */
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
-        /**
-         * sharedPreferences is used to save key-value pairs.
-         *
-         * A SharedPreferences object points to a file containing key-value pairs.
-         *
-         * Documentation:
-         * https://developer.android.com/training/data-storage/shared-preferences
-         *
-         * There didn't seem to be a file with the name "PREFERENCE_FILE_KEY" in
-         * the original code...
-         */
         sharedPreferences =
             requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
@@ -104,6 +99,8 @@ class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
         outputTextView = view.findViewById(R.id.output_text_view)
 
         foregroundOnlyLocationButton.setOnClickListener {
+
+            // Original code
             val enabled = sharedPreferences.getBoolean(
                 SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
 
@@ -287,7 +284,17 @@ class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeL
             )
 
             if (location != null) {
-                logResultsToScreen("Foreground location: ${location.toText()}")
+
+                logResultsToScreen(location.toText())
+
+                // Send location
+                viewModel.sendMessage(R.string.location_message_topic.toString(), location.toText().toByteArray())
+
+
+                // Original code
+//                logResultsToScreen("Foreground location: ${location.toText()}")
+
+
             }
         }
     }
