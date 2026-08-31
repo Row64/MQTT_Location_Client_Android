@@ -71,7 +71,13 @@ class LocationFragment : Fragment() {
                             val lat = location.result.latitude
                             val lon = location.result.longitude
 
+                            // For testing
                             println("$lat, $lon")
+
+                            // Send coordinates
+                            viewModel.sendMessage(
+                                "LOCATION_UPDATE",
+                                "$lat, $lon".toByteArray())
                         }
 
                     // Send location updates
