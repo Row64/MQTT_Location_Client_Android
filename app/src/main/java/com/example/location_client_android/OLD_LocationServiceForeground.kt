@@ -28,7 +28,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import java.util.concurrent.TimeUnit
 
-class LocationServiceForeground : Service() {
+class OLD_LocationServiceForeground : Service() {
     private var configurationChange = false
 
     private var serviceRunningInForeground = false
@@ -58,10 +58,10 @@ class LocationServiceForeground : Service() {
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // TODO: Step 1.2, Review the FusedLocationProviderClient.
+        // FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // TODO: Step 1.3, Create a LocationRequest.
+        // Create a LocationRequest.
         locationRequest = LocationRequest.create().apply {
             // Sets the desired interval for active location updates. This interval is inexact. You
             // may not receive updates at all if no location sources are available, or you may
@@ -84,6 +84,8 @@ class LocationServiceForeground : Service() {
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
+
+
 
         // TODO: Step 1.4, Initialize the LocationCallback.
         locationCallback = object : LocationCallback() {
@@ -185,10 +187,10 @@ class LocationServiceForeground : Service() {
         // Binding to this service doesn't actually trigger onStartCommand(). That is needed to
         // ensure this Service can be promoted to a foreground service, i.e., the service needs to
         // be officially started (which we do here).
-        startService(Intent(applicationContext, LocationServiceForeground::class.java))
+        startService(Intent(applicationContext, OLD_LocationServiceForeground::class.java))
 
         try {
-            // TODO: Step 1.5, Subscribe to location changes.
+            // Subscribe to location changes.
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest, locationCallback, Looper.getMainLooper())
         } catch (unlikely: SecurityException) {
@@ -201,7 +203,7 @@ class LocationServiceForeground : Service() {
         Log.d(TAG, "unsubscribeToLocationUpdates()")
 
         try {
-            // TODO: Step 1.6, Unsubscribe to location changes.
+            // Unsubscribe to location changes.
             val removeTask = fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             removeTask.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -255,7 +257,7 @@ class LocationServiceForeground : Service() {
         // 3. Set up main Intent/Pending Intents for notification.
         val launchActivityIntent = Intent(this, MainActivity::class.java)
 
-        val cancelIntent = Intent(this, LocationServiceForeground::class.java)
+        val cancelIntent = Intent(this, OLD_LocationServiceForeground::class.java)
         cancelIntent.putExtra(EXTRA_CANCEL_LOCATION_TRACKING_FROM_NOTIFICATION, true)
 
         // I added "or PendingIntent.FLAG_MUTABLE" to resolve the issue with the app crashing when switching fragments
@@ -297,8 +299,8 @@ class LocationServiceForeground : Service() {
      * clients, we don't need to deal with IPC.
      */
     inner class LocalBinder : Binder() {
-        internal val service: LocationServiceForeground
-            get() = this@LocationServiceForeground
+        internal val service: OLD_LocationServiceForeground
+            get() = this@OLD_LocationServiceForeground
     }
 
     companion object {

@@ -42,7 +42,7 @@
 
         <!-- Location services -->
         <service
-            android:name=".LocationServiceForeground"
+            android:name=".OLD_LocationServiceForeground"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

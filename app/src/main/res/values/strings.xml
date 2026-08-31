@@ -19,5 +19,7 @@
     <string name="disconnect_btn_cancel">Disconnect</string>
 
     <string name="location_message_topic">LOCATION_UPDATE</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

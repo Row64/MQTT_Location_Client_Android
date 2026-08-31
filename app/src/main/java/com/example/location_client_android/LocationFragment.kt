@@ -1,304 +1,259 @@
-/**
- * Code adapted from:
- * https://github.com/android/codelab-while-in-use-location
- */
-
 package com.example.location_client_android
 
 import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.ComponentName
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
-import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
-import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import kotlin.getValue
+import android.location.Location
+import com.google.android.gms.tasks.Task
 
-private const val TAG = "MainActivity"
-private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
-
-class LocationFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class LocationFragment : Fragment() {
 
     // ViewModel instance
     private val viewModel: ViewModelPrimary by activityViewModels()
 
+    // Location services client
+    // https://developer.android.com/develop/sensors-and-location/location/retrieve-current
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+//    var fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-
-    private var locationServiceForegroundBound = false
-
-    // Provides location updates for while-in-use feature.
-    private var locationServiceForeground: LocationServiceForeground? = null
-
-    // Listens for location broadcasts from LocationServiceForeground.
-    private lateinit var foregroundOnlyBroadcastReceiver: ForegroundOnlyBroadcastReceiver
-
-    private lateinit var sharedPreferences: SharedPreferences
-
-    private lateinit var foregroundOnlyLocationButton: Button
-
-    private lateinit var outputTextView: TextView
-
-    // Monitors connection to the while-in-use service.
-    private val foregroundOnlyServiceConnection = object : ServiceConnection {
-
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            val binder = service as LocationServiceForeground.LocalBinder
-            locationServiceForeground = binder.service
-            locationServiceForegroundBound = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            locationServiceForeground = null
-            locationServiceForegroundBound = false
-        }
-    }
 
     /**
-     * Inflates the layout.
+     * Part of requesting location permission:
+     * https://developer.android.com/develop/sensors-and-location/location/permissions/runtime#user-choice-affects-permission-grants
+     *
+     * Need to call registerForActivityResult during fragment creation, not before.
+     * Otherwise, an exception will be thrown.
+     */
+    @SuppressLint("MissingPermission")
+    val locationPermissionRequest = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                    // Precise location access granted.
+
+                    println("FINE LOCATION PERMISSION GRANTED")
+
+
+                    // Get location
+                    // Help with parameters from: https://stackoverflow.com/questions/71137555/getcurrentlocation-method-in-kotlin
+                    fusedLocationClient.getCurrentLocation(
+                        LocationRequest.PRIORITY_HIGH_ACCURACY,
+                        null)
+                        .addOnCompleteListener { location : Task<Location> ->
+                            val lat = location.result.latitude
+                            val lon = location.result.longitude
+
+                            println("$lat, $lon")
+                        }
+
+                    // Send location updates
+//                    viewModel.
+
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    // Only approximate location access granted.
+
+                    println("COARSE LOCATION PERMISSION GRANTED")
+
+                    // ...
+
+                }
+                else -> {
+                    // No location access granted.
+
+                    println("PERMISSION DENIED")
+                }
+            }
+        }
+
+
+    // Request location permissions
+    fun requestPermissions() {
+
+        // Before you perform the actual permission request, check whether your app
+        // already has the permissions, and whether your app needs to show a permission
+        // rationale dialog. For more details, see Request permissions:
+        // https://developer.android.com/training/permissions/requesting#request-permission
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+
+    /**
+     * Enables the use of Composables in a legacy fragment.
+     * This requires the XML layout to have a ComposeView block
+     *
+     * https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/compose-in-views#compose-in-fragments
      */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.layout_fragment_location, container, false)
-    }
+    ): View {
+
+        // Initialize the fused location client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        val view = inflater.inflate(R.layout.fragment_location, container, false)
+        val composeView = view.findViewById<ComposeView>(R.id.compose_view)
+        composeView.apply {
+            // Dispose of the Composition when the view's LifecycleOwner
+            // is destroyed
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                // Compose UI elements go here
+                MaterialTheme {
+
+//                    SendLocationUpdatesUI(viewModel, this.context)
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // ---------------------------------------------------------------------------------------------------
-        /**
-         * Code copied from the original onCreate
-         */
-        foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
-
-        sharedPreferences =
-            requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-
-        foregroundOnlyLocationButton = view.findViewById(R.id.foreground_only_location_button)
-        outputTextView = view.findViewById(R.id.output_text_view)
-
-        foregroundOnlyLocationButton.setOnClickListener {
-
-            // Original code
-            val enabled = sharedPreferences.getBoolean(
-                SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-
-            if (enabled) {
-                locationServiceForeground?.unsubscribeToLocationUpdates()
-            } else {
-                // Review Permissions: Checks and requests if needed.
-                if (foregroundPermissionApproved()) {
-                    locationServiceForeground?.subscribeToLocationUpdates()
-                        ?: Log.d(TAG, "Service Not Bound")
-                } else {
-                    requestForegroundPermissions()
-                }
-            }
-        }
-        // ---------------------------------------------------------------------------------------------------
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        updateButtonState(
-            sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-        )
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-
-        val serviceIntent = Intent(requireContext(), LocationServiceForeground::class.java)
-        requireContext().bindService(serviceIntent, foregroundOnlyServiceConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
-            foregroundOnlyBroadcastReceiver,
-            IntentFilter(
-                LocationServiceForeground.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
-        )
-    }
-
-    override fun onPause() {
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(
-            foregroundOnlyBroadcastReceiver
-        )
-        super.onPause()
-    }
-
-    override fun onStop() {
-        if (locationServiceForegroundBound) {
-            requireContext().unbindService(foregroundOnlyServiceConnection)
-            locationServiceForegroundBound = false
-        }
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-
-        super.onStop()
-    }
+                    Column(
+                        modifier = Modifier
+                            .padding(48.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
 
 
-    /**
-     * I had to update this function's signature for the override to be recognized.
-     * All I had to do was make the String nullable for the key parameter.
-     *
-     * Original signature:
-     * override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String)
-     */
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        // Updates button states if new while in use location is added to SharedPreferences.
-        if (key == SharedPreferenceUtil.KEY_FOREGROUND_ENABLED) {
-            updateButtonState(sharedPreferences.getBoolean(
-                SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-            )
-        }
-    }
-
-    // Method checks if permissions approved.
-    private fun foregroundPermissionApproved(): Boolean {
-        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-    }
-
-    // Method requests permissions.
-    private fun requestForegroundPermissions() {
-        val provideRationale = foregroundPermissionApproved()
-
-        // If the user denied a previous request, but didn't check "Don't ask again", provide
-        // additional rationale.
-        if (provideRationale) {
-            Snackbar.make(
-                requireView().findViewById(R.id.activity_main),
-                R.string.permission_rationale,
-                Snackbar.LENGTH_LONG
-            )
-                .setAction(R.string.ok) {
-                    // Request permission
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-                    )
-                }
-                .show()
-        } else {
-            Log.d(TAG, "Request foreground only permission")
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-            )
-        }
-    }
-
-    // Review Permissions: Handles permission result.
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d(TAG, "onRequestPermissionResult")
-
-        when (requestCode) {
-            REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE -> when {
-                grantResults.isEmpty() ->
-                    // If user interaction was interrupted, the permission request
-                    // is cancelled and you receive empty arrays.
-                    Log.d(TAG, "User interaction was cancelled.")
-                grantResults[0] == PackageManager.PERMISSION_GRANTED ->
-                    // Permission was granted.
-                    locationServiceForeground?.subscribeToLocationUpdates()
-                else -> {
-                    // Permission denied.
-                    updateButtonState(false)
-
-                    Snackbar.make(
-                        requireView().findViewById(R.id.activity_main),
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_LONG
-                    )
-                        .setAction(R.string.settings) {
-                            // Build intent that displays the App settings screen.
-                            val intent = Intent()
-                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts(
-                                "package",
-                                "com.example.location_client_android", // ORIGINAL: BuildConfig.APPLICATION_ID
-                                null
-                            )
-                            intent.data = uri
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
+                        // Send location updates button
+                        Button(
+                            onClick = {
+                                // Request permission, if needed
+                                println("Arrived at permissions request...")
+                                requestPermissions()
+                            },
+                            enabled = viewModel.locationBtnEnabled,
+                        )
+                        {
+                            Text("Send location updates")
                         }
-                        .show()
+
+
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 }
             }
         }
+        return view
     }
-
-    private fun updateButtonState(trackingLocation: Boolean) {
-        if (trackingLocation) {
-            foregroundOnlyLocationButton.text = getString(R.string.stop_location_updates_button_text)
-        } else {
-            foregroundOnlyLocationButton.text = getString(R.string.start_location_updates_button_text)
-        }
-    }
-
-    private fun logResultsToScreen(output: String) {
-        val outputWithPreviousLogs = "$output\n${outputTextView.text}"
-        outputTextView.text = outputWithPreviousLogs
-    }
-
-    /**
-     * Receiver for location broadcasts from [LocationServiceForeground].
-     */
-    private inner class ForegroundOnlyBroadcastReceiver : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            val location = intent.getParcelableExtra<Location>(
-                LocationServiceForeground.EXTRA_LOCATION
-            )
-
-            if (location != null) {
-
-                logResultsToScreen(location.toText())
-
-                // Send location
-                viewModel.sendMessage(R.string.location_message_topic.toString(), location.toText().toByteArray())
-
-
-                // Original code
-//                logResultsToScreen("Foreground location: ${location.toText()}")
-
-
-            }
-        }
-    }
-
-
 
 }
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun SendLocationUpdatesUI(viewModel: ViewModelPrimary, context: Context) {
+
+    Column(
+        modifier = Modifier
+            .padding(48.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+
+
+        // Send location updates button
+        Button(
+            onClick = {
+
+                // ---------------------------------------------------------------------------------
+                // LOCATION PERMISSIONS
+
+                // https://medium.com/@mahbooberezaee68/mastering-location-services-in-jetpack-compose-a-step-by-step-tutorial-lesson-1-d60dde62a07e
+
+
+                // Check if app already has the needed permission
+//                val hasFineLocationPermission = ContextCompat.checkSelfPermission(
+//                    context,
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) == PackageManager.PERMISSION_GRANTED
+
+                println("Arrived at permissions request...")
+
+//                val request = RequestLocation()
+
+//                request.requestPermissions()
+
+
+
+
+
+
+
+
+                // Request permissions, if needed
+
+                // Connected to broker?
+
+                // Send location updates
+
+
+            },
+            enabled = viewModel.locationBtnEnabled,
+//                modifier = Modifier.size(width = 80.dp, height = 20.dp)
+        )
+        {
+            Text("Send location updates")
+        }
+
+
+
+
+
+    }
+}
+

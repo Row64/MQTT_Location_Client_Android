@@ -34,8 +34,8 @@ class ViewModelPrimary : ViewModel() {
     var loginFieldEnabled by mutableStateOf(true)
         private set
 
-//    var locationButtonEnabled by mutableStateOf(true)
-//        private set
+    var locationBtnEnabled by mutableStateOf(true)
+        private set
 
 
 
@@ -188,9 +188,7 @@ class ViewModelPrimary : ViewModel() {
     }
 
 
-
-
-    // FOR TESTING
+    // Send an MQTT message
     fun sendMessage(topic: String, payload: ByteArray) {
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -240,6 +238,11 @@ class ViewModelPrimary : ViewModel() {
 
     fun toggleLoginFieldEnabled(toggle: Boolean) {
         loginFieldEnabled = toggle
+    }
+
+
+    fun toggleLocationBtnEnabled(toggle: Boolean) {
+        locationBtnEnabled = toggle
     }
 
     // ---------------------------------------------------------------------------------------------
