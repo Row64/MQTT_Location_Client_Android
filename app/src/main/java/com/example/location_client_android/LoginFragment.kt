@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -103,6 +104,8 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
                 println("FINE LOCATION PERMISSION GRANTED")
 
+                viewModel.updateOutputMessage("Sending location updates. Check your broker for results.")
+
                 // Define the location update callback
                 // https://developer.android.com/develop/sensors-and-location/location/request-updates
                 locationCallback = object : LocationCallback() {
@@ -146,16 +149,18 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
             }
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                 // Only approximate location access granted.
-
                 println("COARSE LOCATION PERMISSION GRANTED")
-
-                // ...
+                viewModel.updateOutputMessage("ERROR: Only approximate location was granted. " +
+                        "The app cannot operate as intended and will not permit location updates. " +
+                        "Please grant this app access to exact location in the system settings.")
 
             }
             else -> {
                 // No location access granted.
-
                 println("PERMISSION DENIED")
+                viewModel.updateOutputMessage("ERROR: Location permissions were denied. " +
+                        "The app cannot operate as intended and will not permit location updates. " +
+                        "Please grant this app access to exact location in the system settings.")
             }
         }
     }
@@ -224,6 +229,8 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                         var statePort = rememberTextFieldState()
                         var stateUser = rememberTextFieldState()
                         var statePass = rememberTextFieldState()
+
+                        var stateStatus = rememberTextFieldState()
 
                         // Host field
                         OutlinedTextField(
@@ -329,59 +336,64 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                             }
                         }
 
+                    // -----------------------------------------------------------------------------
+                    // LOCATION UI
 
-                            // -----------------------------------------------------------------------------
-                            // LOCATION UI
+                        // Send location updates button
+                        Button(
+                            onClick = {
 
-//                            Column(
-//                                modifier = Modifier
-//                                    .padding(48.dp)
-//                                    .fillMaxSize(),
-//                                verticalArrangement = Arrangement.spacedBy(24.dp),
-//                                horizontalAlignment = Alignment.CenterHorizontally,
-//                            ) {
+                                viewModel.updateOutputMessage("Attempting to send location updates...")
 
-                                // Send location updates button
-                                Button(
-                                    onClick = {
+                                viewModel.toggleLocationBtnEnabled(false)
+                                viewModel.toggleLocationCancelBtnEnabled(true)
 
-                                        viewModel.toggleLocationBtnEnabled(false)
-                                        viewModel.toggleLocationCancelBtnEnabled(true)
+                                // Request permission, if needed
+                                println("Arrived at permissions request...")
+                                requestPermissions()
+                            },
+                            enabled = viewModel.locationBtnEnabled,
+                        )
+                        {
+                            Text("Send location updates")
+                        }
 
-                                        // Request permission, if needed
-                                        println("Arrived at permissions request...")
-                                        requestPermissions()
-                                    },
-                                    enabled = viewModel.locationBtnEnabled,
-                                )
-                                {
-                                    Text("Send location updates")
-                                }
+                        // Stop updates button
+                        FilledTonalButton(
+                            onClick = {
 
-                                // Stop updates button
-                                FilledTonalButton(
-                                    onClick = {
+                                viewModel.updateOutputMessage("Location updates canceled.")
 
-                                        println("Cancelled location updates")
+                                println("Cancelled location updates")
 
-                                        viewModel.toggleLocationBtnEnabled(true)
-                                        viewModel.toggleLocationCancelBtnEnabled(false)
+                                viewModel.toggleLocationBtnEnabled(true)
+                                viewModel.toggleLocationCancelBtnEnabled(false)
 
-                                        // Cancel the location updates
-                                        fusedLocationClient.removeLocationUpdates(locationCallback)
-                                    },
-                                    enabled = viewModel.locationCancelBtnEnabled,
-                                )
-                                {
-                                    Text("Stop sending updates")
-                                }
+                                // Cancel the location updates
+                                fusedLocationClient.removeLocationUpdates(locationCallback)
+                            },
+                            enabled = viewModel.locationCancelBtnEnabled,
+                        )
+                        {
+                            Text("Stop sending updates")
+                        }
 
 
-                            }
-//                        }
+
+
+                    // -----------------------------------------------------------------------------
+                    // STATUS UPDATES
+
+                        // Status
+                        Text(
+                            text = viewModel.outputMessage
+                        )
+
+
 
                     // -----------------------------------------------------------------------------
 
+                    }
 
                 }
             }

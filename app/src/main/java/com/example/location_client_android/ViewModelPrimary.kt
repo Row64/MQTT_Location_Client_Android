@@ -38,6 +38,8 @@ class ViewModelPrimary : ViewModel() {
     var locationCancelBtnEnabled by mutableStateOf(false)
         private set
 
+    var outputMessage by mutableStateOf("Output will appear here...")
+        private set
 
 
     // Raw user input variables
@@ -65,6 +67,9 @@ class ViewModelPrimary : ViewModel() {
     fun tryConnect() {
 
         try {
+
+            // TESTING
+            outputMessage = "Attempting to connect..."
 
             // Basic input validation and assign user input to MqLogin object
             // Throws MqCredentialException for credential-related issues
@@ -94,10 +99,17 @@ class ViewModelPrimary : ViewModel() {
                     loginFieldEnabled = true
                     locationBtnEnabled = false
                     locationCancelBtnEnabled = false
+
+                    outputMessage = "Failed to connect. Verify your credentials and that your device has " +
+                            "a connection to the Internet (Wi-Fi or cellular). If needed, also verify that " +
+                            "your broker is configured correctly."
+
                 }
                 else {
                     // Enable send location button on successful connection
                     locationBtnEnabled = true
+
+                    outputMessage = "Successfully connected! You may now send location updates."
                 }
 
                 println("Reached end of coroutine")
@@ -129,6 +141,9 @@ class ViewModelPrimary : ViewModel() {
         {
             // Make fields show error indicator
             loginFieldError = true
+
+            outputMessage = "ERROR: Host and port are required. " +
+                    "Additionally provide a username and password if your broker requires it."
 
             throw MqCredentialException(
                 "Missing a required credential. Host and Port are required." +
@@ -238,6 +253,14 @@ class ViewModelPrimary : ViewModel() {
 
     fun toggleLocationCancelBtnEnabled(toggle: Boolean) {
         locationCancelBtnEnabled = toggle
+    }
+
+    fun updateOutputMessage(message: String) {
+        outputMessage = message
+    }
+
+    fun appendOutputMessage(message: String) {
+        outputMessage += message
     }
 
     // ---------------------------------------------------------------------------------------------
