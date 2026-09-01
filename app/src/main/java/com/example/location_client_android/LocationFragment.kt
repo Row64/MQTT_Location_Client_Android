@@ -32,6 +32,7 @@ import com.google.android.gms.location.LocationServices
 import kotlin.getValue
 import android.location.Location
 import android.os.Looper
+import androidx.compose.material3.FilledTonalButton
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
@@ -88,7 +89,15 @@ class LocationFragment : Fragment() {
                             for (location in locationResult.locations) {
 
                                 // Do something with location data
+
+                                // For testing
                                 println("${location.latitude}, ${location.longitude}, ${location.time}")
+
+                                // Send data
+                                viewModel.sendMessage(
+                                    "R64_LOCATION_UPDATE",
+                                    "${location.latitude}, ${location.longitude}".toByteArray()
+                                )
 
 
                             }
@@ -111,29 +120,6 @@ class LocationFragment : Fragment() {
                     )
 
 
-
-
-
-
-                    // Help with parameters from: https://stackoverflow.com/questions/71137555/getcurrentlocation-method-in-kotlin
-//                    fusedLocationClient.getCurrentLocation(
-//                        LocationRequest.PRIORITY_HIGH_ACCURACY,
-//                        null)
-//                        .addOnCompleteListener { location : Task<Location> ->
-//                            val lat = location.result.latitude
-//                            val lon = location.result.longitude
-//
-//                            // For testing
-//                            println("$lat, $lon")
-//
-//                            // Send coordinates
-//                            viewModel.sendMessage(
-//                                "LOCATION_UPDATE",
-//                                "$lat, $lon".toByteArray())
-//                        }
-
-                    // Send location updates
-//                    viewModel.
 
                 }
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
@@ -209,6 +195,10 @@ class LocationFragment : Fragment() {
                         // Send location updates button
                         Button(
                             onClick = {
+
+                                viewModel.toggleLocationBtnEnabled(false)
+                                viewModel.toggleLocationCancelBtnEnabled(true)
+
                                 // Request permission, if needed
                                 println("Arrived at permissions request...")
                                 requestPermissions()
@@ -217,6 +207,24 @@ class LocationFragment : Fragment() {
                         )
                         {
                             Text("Send location updates")
+                        }
+
+                        // Stop updates button
+                        FilledTonalButton(
+                            onClick = {
+
+                                println("Cancelled location updates")
+
+                                viewModel.toggleLocationBtnEnabled(true)
+                                viewModel.toggleLocationCancelBtnEnabled(false)
+
+                                // Cancel the location updates
+                                fusedLocationClient.removeLocationUpdates(locationCallback)
+                            },
+                            enabled = viewModel.locationCancelBtnEnabled,
+                        )
+                        {
+                            Text("Stop sending updates")
                         }
 
 

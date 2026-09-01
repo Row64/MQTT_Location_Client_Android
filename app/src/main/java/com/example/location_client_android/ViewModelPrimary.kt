@@ -35,6 +35,8 @@ class ViewModelPrimary : ViewModel() {
         private set
     var locationBtnEnabled by mutableStateOf(true)
         private set
+    var locationCancelBtnEnabled by mutableStateOf(false)
+        private set
 
 
 
@@ -242,6 +244,10 @@ class ViewModelPrimary : ViewModel() {
 
     fun toggleLocationBtnEnabled(toggle: Boolean) {
         locationBtnEnabled = toggle
+    }
+
+    fun toggleLocationCancelBtnEnabled(toggle: Boolean) {
+        locationCancelBtnEnabled = toggle
     }
 
     // ---------------------------------------------------------------------------------------------

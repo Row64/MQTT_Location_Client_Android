@@ -234,7 +234,17 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
 
         }
 
+        // -----------------------------------------------------------------------------------------
+        // LOCATION
 
+
+
+
+
+
+
+
+        // -----------------------------------------------------------------------------------------
 
 
         // Connection status
@@ -245,9 +255,9 @@ fun ConnectScreen(viewModel: ViewModelPrimary) {
          * Consider placing in a text box. The text box should be centered, but the text within
          * the box should be left-aligned
          */
-        Text(
-            text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
-        )
+//        Text(
+//            text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
+//        )
 
         // Test send message
         // FOR TESTING
