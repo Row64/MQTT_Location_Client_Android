@@ -31,6 +31,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import kotlin.getValue
 import android.location.Location
+import android.os.Looper
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.Task
 
 class LocationFragment : Fragment() {
@@ -41,7 +45,22 @@ class LocationFragment : Fragment() {
     // Location services client
     // https://developer.android.com/develop/sensors-and-location/location/retrieve-current
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-//    var fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+    // Device location object
+    private var deviceLocation: Location? = null
+
+    // Location request settings
+    // https://developer.android.com/develop/sensors-and-location/location/change-location-settings
+    private val locationRequest = LocationRequest.Builder(
+        Priority.PRIORITY_HIGH_ACCURACY,
+        10000
+    )
+        .setMinUpdateIntervalMillis(5000)
+        .build()
+
+    // Location callback
+    // https://developer.android.com/develop/sensors-and-location/location/request-updates
+    private lateinit var locationCallback: LocationCallback
 
 
     /**
@@ -61,24 +80,57 @@ class LocationFragment : Fragment() {
 
                     println("FINE LOCATION PERMISSION GRANTED")
 
+                    // Define the location update callback
+                    // https://developer.android.com/develop/sensors-and-location/location/request-updates
+                    locationCallback = object : LocationCallback() {
+                        override fun onLocationResult(locationResult: LocationResult) {
+                            locationResult ?: return
+                            for (location in locationResult.locations) {
 
-                    // Get location
-                    // Help with parameters from: https://stackoverflow.com/questions/71137555/getcurrentlocation-method-in-kotlin
-                    fusedLocationClient.getCurrentLocation(
-                        LocationRequest.PRIORITY_HIGH_ACCURACY,
-                        null)
-                        .addOnCompleteListener { location : Task<Location> ->
-                            val lat = location.result.latitude
-                            val lon = location.result.longitude
+                                // Do something with location data
+                                println("${location.latitude}, ${location.longitude}, ${location.time}")
 
-                            // For testing
-                            println("$lat, $lon")
 
-                            // Send coordinates
-                            viewModel.sendMessage(
-                                "LOCATION_UPDATE",
-                                "$lat, $lon".toByteArray())
+                            }
                         }
+                    }
+
+
+                    // Get last known location as a baseline
+                    // https://developer.android.com/develop/sensors-and-location/location/retrieve-current#kotlin
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location : Location? ->
+                            deviceLocation = location
+                        }
+
+
+                    fusedLocationClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
+
+
+
+
+
+
+                    // Help with parameters from: https://stackoverflow.com/questions/71137555/getcurrentlocation-method-in-kotlin
+//                    fusedLocationClient.getCurrentLocation(
+//                        LocationRequest.PRIORITY_HIGH_ACCURACY,
+//                        null)
+//                        .addOnCompleteListener { location : Task<Location> ->
+//                            val lat = location.result.latitude
+//                            val lon = location.result.longitude
+//
+//                            // For testing
+//                            println("$lat, $lon")
+//
+//                            // Send coordinates
+//                            viewModel.sendMessage(
+//                                "LOCATION_UPDATE",
+//                                "$lat, $lon".toByteArray())
+//                        }
 
                     // Send location updates
 //                    viewModel.

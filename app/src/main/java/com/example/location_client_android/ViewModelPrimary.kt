@@ -33,7 +33,6 @@ class ViewModelPrimary : ViewModel() {
         private set
     var loginFieldEnabled by mutableStateOf(true)
         private set
-
     var locationBtnEnabled by mutableStateOf(true)
         private set
 
