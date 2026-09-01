@@ -310,7 +310,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                                 Text(text = stringResource(R.string.connect_btn_connect))
                             }
 
-                            // Cancel/Disconnect button
+                            // Disconnect button
                             FilledTonalButton(
                                 onClick = {
 
@@ -325,9 +325,15 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                                     viewModel.toggleLocationCancelBtnEnabled(false)
 
                                     // Cancel location updates
-                                    println("Cancelled location updates")
-                                    fusedLocationClient.removeLocationUpdates(locationCallback)
+                                    println("Canceled location updates")
 
+                                    // Removing callback throws exception if not client is not yet initialized
+                                    try {
+                                        fusedLocationClient.removeLocationUpdates(locationCallback)
+                                        viewModel.updateOutputMessage("Disconnected from broker and canceled location updates.")
+                                    }
+                                    // No need to do anything if exception is caught
+                                    catch(e: Exception) { }
                                 },
                                 enabled = viewModel.disconnectBtnEnabled
                             )
