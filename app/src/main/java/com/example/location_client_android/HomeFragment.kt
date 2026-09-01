@@ -4,6 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,9 +23,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 
 class HomeFragment : Fragment(R.layout.layout_fragment_home) {
 
@@ -57,7 +72,23 @@ class HomeFragment : Fragment(R.layout.layout_fragment_home) {
                 // Compose UI elements go here
                 MaterialTheme {
 
-                    TestLayout(viewModel)
+                    Column(
+                        modifier = Modifier
+                            .padding(48.dp)
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        MainTitle()
+                        R64Image()
+                        BodyText()
+                    }
+
+
+
+
+
 
                 }
             }
@@ -69,39 +100,36 @@ class HomeFragment : Fragment(R.layout.layout_fragment_home) {
 
 }
 
+
 @Composable
-fun TestLayout( /* viewModel: ViewModelPrimary = viewModel() */ viewModel: ViewModelPrimary) {
+fun MainTitle() {
+    Text(
+        text = "Row64 Client Signal Generator",
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.headlineLarge,
+        modifier = Modifier
+            .padding(bottom = 20.dp)
+    )
+}
 
-    // TESTING
-    // https://proandroiddev.com/jetpack-compose-with-android-fragment-ui-data-sharing-ae7077a9a160
-    val viewHost by viewModel.inputHost.observeAsState()
-    val viewPort by viewModel.inputPort.observeAsState()
-    val viewUser by viewModel.inputUser.observeAsState()
-    val viewPass by viewModel.inputPass.observeAsState()
+@Composable
+fun R64Image() {
+    Image(
+        painter = painterResource(id = R.drawable.r64_mqtt_client_image),
+        contentDescription = null,
+        modifier = Modifier
+            .padding(bottom = 20.dp)
+    )
+}
 
-    // FOR TESTING
-    Button(
-        onClick = {
-
-            // FOR TESTING ONLY! *************************
-            println("Home button:")
-            // FOR TESTING
-            println("Variables from login fragment:" +
-                    "\n\tHost: $viewHost" +
-                    "\n\tPort: $viewPort" +
-                    "\n\tUser: $viewUser" +
-                    "\n\tPass: $viewPass")
-            // Re-enable Connect button on login fragment
-            viewModel.toggleConnectBtn(true)
-            viewModel.toggleFieldError(false)
-            viewModel.toggleLoginFieldEnabled(true)
-            viewModel.toggleDisconnectBtn(false)
-
-
-
-
-        } )
-    {
-        Text(text = "Test")
-    }
+@Composable
+fun BodyText() {
+    Text(
+        text = "Supported MQTT version:\n5, 3.1.1\n\n" +
+                "MQTT message topic: R64_LOCATION_UPDATE\n\n" +
+                "Update interval rate:\n5 seconds",
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .height(300.dp)
+    )
 }

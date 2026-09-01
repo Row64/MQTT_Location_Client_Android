@@ -5,38 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    Fragment container-->
-<!--    https://developer.android.com/guide/fragments/create#add-xml-->
-<!--    https://developer.android.com/guide/navigation/design/kotlin-dsl#host-->
+    <!--Fragment container-->
+    <!--https://developer.android.com/guide/fragments/create#add-xml-->
+    <!--https://developer.android.com/guide/navigation/design/kotlin-dsl#host-->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="263dp"
-        android:layout_height="128dp"
-        android:layout_marginStart="74dp"
-        android:layout_marginTop="47dp"
-        android:src="@android:mipmap/sym_def_app_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="101dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="102dp"
-        android:text="Home Fragment"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+    <!--Enables the use of Compose in the associated fragment-->
+    <!--https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/compose-in-views#compose-in-fragments-->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

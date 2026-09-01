@@ -38,7 +38,7 @@ class ViewModelPrimary : ViewModel() {
     var locationCancelBtnEnabled by mutableStateOf(false)
         private set
 
-    var outputMessage by mutableStateOf("Output will appear here...")
+    var outputMessage by mutableStateOf("Output will appear here.")
         private set
 
 
