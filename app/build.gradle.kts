@@ -1,12 +1,15 @@
-
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
+    // Kotlin serialization plugin for type safe routes and navigation arguments
+    // https://developer.android.com/guide/navigation#kts
+//    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.4.10"
 }
 
 android {
-    namespace = "com.example.mqtt_client_v4"
+    namespace = "com.example.location_client_android"
     compileSdk {
         version = release(37) {
             minorApiLevel = 0
@@ -14,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mqtt_client_v4"
+        applicationId = "com.example.location_client_android"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -31,44 +34,21 @@ android {
         }
     }
     compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_11
-//        targetCompatibility = JavaVersion.VERSION_11
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
+    // For HiveMQ
+    // https://hivemq.github.io/hivemq-mqtt-client/docs/installation/android/
     packagingOptions {
         resources {
             excludes += listOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
         }
     }
 
-
     buildFeatures {
         compose = true
     }
-
-    /**
-     * The following block was added to resolve a compile error after importing the
-     * HiveMQ library.
-     *
-     * The error: "6 files found with path 'META-INF/INDEX.LIST' from inputs: ..."
-     *
-     * See the following article:
-     *  https://community.hivemq.com/t/com-hivemq1-2-1/1259/2
-     *
-     * Had to change the quotation marks to get this to work.
-     */
-//    packagingOptions {
-//        resources {
-//            resources.excludes.add("META-INF/{AL2.0,LGPL2.1}")
-//            resources.excludes.add("META-INF/LICENSE.md")
-//            resources.excludes.add("META-INF/LICENSE-notice.md")
-//            resources.excludes.add("META-INF/INDEX.LIST")
-//            resources.excludes.add("META-INF/*.properties")
-//        }
-//    }
-
 }
 
 dependencies {
@@ -80,7 +60,40 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation("com.hivemq:hivemq-mqtt-client:1.3.17")
+
+    // HiveMQ
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
+
+    // ViewModel
+    // https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state#0
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.12.0")
+
+
+    // Fragments
+    // https://developer.android.com/guide/fragments/create#kts
+    implementation("androidx.fragment:fragment-ktx:1.9.0")
+
+    // Dependencies for app navigation
+    // https://developer.android.com/guide/navigation#kts
+    val nav_version = "2.9.8"
+    implementation("androidx.navigation:navigation-compose:$nav_version")                       // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-fragment:$nav_version")                      // Views/Fragments integration
+    implementation("androidx.navigation:navigation-ui:$nav_version")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")     // Feature module support for Fragments
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")            // Testing Navigation
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")                    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation("com.google.android.gms:play-services-location:21.4.0")                      // Dependencies for location
+
+//    implementation(libs.navigation.compose)
+//    implementation(libs.kotlinx.serialization.json)
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+
+    // Needed for depreciated libraries
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")                // Used in LocationServiceForeground.kt
+    implementation("androidx.appcompat:appcompat:1.8.0")                                        // Used in LocationActivity.kt
+    implementation("com.google.android.material:material:1.14.0")                               // Used in LocationActivity.kt
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
