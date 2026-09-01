@@ -168,7 +168,8 @@ class ViewModelPrimary : ViewModel() {
 
             }
             catch(e: NumberFormatException) {
-                throw MqCredentialException("Port must be a positive integer within the range of" +
+                outputMessage = "ERROR: Port must be an integer within the range of 1 to 65,535"
+                throw MqCredentialException("Port must be a positive integer within the range of " +
                         "1 to 65,535.")
             }
 

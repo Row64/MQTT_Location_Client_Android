@@ -10,19 +10,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
@@ -214,7 +218,8 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                     Column(
                         modifier = Modifier
                             .padding(48.dp)
-                            .fillMaxSize(),
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -392,7 +397,9 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
                         // Status
                         Text(
-                            text = viewModel.outputMessage
+                            text = viewModel.outputMessage,
+                            modifier = Modifier
+                                .height(250.dp)
                         )
 
 
