@@ -33,7 +33,7 @@ class ViewModelPrimary : ViewModel() {
         private set
     var loginFieldEnabled by mutableStateOf(true)
         private set
-    var locationBtnEnabled by mutableStateOf(true)
+    var locationBtnEnabled by mutableStateOf(false)
         private set
     var locationCancelBtnEnabled by mutableStateOf(false)
         private set
@@ -92,15 +92,15 @@ class ViewModelPrimary : ViewModel() {
                     connectBtnEnabled = true
                     disconnectBtnEnabled = false
                     loginFieldEnabled = true
-
-                    // UPDATE CONNECTION STATUS INDICATOR UI (Fail)
-                    // ...
+                    locationBtnEnabled = false
+                    locationCancelBtnEnabled = false
+                }
+                else {
+                    // Enable send location button on successful connection
+                    locationBtnEnabled = true
                 }
 
                 println("Reached end of coroutine")
-
-                // UPDATE CONNECTION STATUS INDICATOR UI (Success)
-                // ...
 
             }
 
@@ -112,9 +112,6 @@ class ViewModelPrimary : ViewModel() {
 
             println(e.message)
             loginFieldError = true
-
-            // UPDATE CONNECTION STATUS INDICATOR UI (Bad credential formatting)
-            // ...
 
         }
     }
@@ -175,13 +172,6 @@ class ViewModelPrimary : ViewModel() {
                 mqLogin.pass = inputPass.value
             }
 
-
-            // FOR TESTING
-            println("MqLogin object values:" +
-                    "\n\tHost: ${mqLogin.host}" +
-                    "\n\tPort: ${mqLogin.port}" +
-                    "\n\tUser: ${mqLogin.user}" +
-                    "\n\tPass: ${mqLogin.pass}")
 
         }
 
