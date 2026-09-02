@@ -8,21 +8,8 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.Async
 
 class ViewModelPrimary : ViewModel() {
-
-    /**
-     * StateFlow with custom getters.
-     * https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state
-     *
-     * Made private to ensure that states are not modified by external classes.
-     */
-//    private val _uiStateLogin = MutableStateFlow(LoginFragment())
-//    val uiStateLogin: StateFlow<LoginFragment> = _uiStateLogin.asStateFlow()
-//    private val _uiStateLocation = MutableStateFlow(LocationFragment())
-//    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
-
 
     // Compose UI variables
     var connectBtnEnabled by mutableStateOf(true)
@@ -68,7 +55,6 @@ class ViewModelPrimary : ViewModel() {
 
         try {
 
-            // TESTING
             outputMessage = "Attempting to connect..."
 
             // Basic input validation and assign user input to MqLogin object
@@ -108,12 +94,10 @@ class ViewModelPrimary : ViewModel() {
                 else {
                     // Enable send location button on successful connection
                     locationBtnEnabled = true
-
                     outputMessage = "Successfully connected! You may now send location updates."
                 }
 
                 println("Reached end of coroutine")
-
             }
 
         }
@@ -124,7 +108,6 @@ class ViewModelPrimary : ViewModel() {
 
             println(e.message)
             loginFieldError = true
-
         }
     }
 
@@ -132,6 +115,12 @@ class ViewModelPrimary : ViewModel() {
      * Set the inputted credentials to the login object
      */
     private fun setCredentials() {
+
+        // Ensure credentials are wiped from any previous sessions
+        mqLogin.host = ""
+        mqLogin.port = -1
+        mqLogin.user = null
+        mqLogin.pass = null
 
         // Check for required minimum credentials
         if (inputHost.value.equals(null)
@@ -178,20 +167,22 @@ class ViewModelPrimary : ViewModel() {
             mqLogin.port = portInt
 
             // Assign additional inputs to the MqLogin object, if present.
-            // Username and password are only assigned if they are both present.
+            // Username can be supplied without a password.
+            // Only assign password if additionally supplied with a username.
             if (!(inputUser.value.equals(null)
-                || inputPass.value.equals(null)
-                || inputUser.value.equals("")
-                || inputPass.value.equals("")))
+                || inputUser.value.equals("")))
             {
                 mqLogin.user = inputUser.value
-                mqLogin.pass = inputPass.value
+
+                // Assign password if username is present
+                if (!(inputPass.value.equals(null)
+                    || inputPass.value.equals("")))
+                {
+                    mqLogin.pass = inputPass.value
+                }
             }
 
-
         }
-
-
     }
 
 
@@ -265,7 +256,6 @@ class ViewModelPrimary : ViewModel() {
     }
 
     // ---------------------------------------------------------------------------------------------
-
 
 
 }

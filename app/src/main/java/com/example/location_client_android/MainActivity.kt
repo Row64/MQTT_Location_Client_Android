@@ -1,8 +1,6 @@
 package com.example.location_client_android
 
-import android.Manifest
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -45,9 +43,5 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-
-
-
 
 }

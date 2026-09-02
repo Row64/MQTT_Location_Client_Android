@@ -4,49 +4,18 @@
  * https://www.hivemq.com/blog/mqtt-client-library-enyclopedia-hivemq-mqtt-client/
  */
 
-
-/**
- * IMPLEMENTATION GOALS
- *
- *  - Need to add support for no authentication
- */
-
-
 package com.example.location_client_android
 
-import com.google.android.gms.tasks.Tasks.await
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
-import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
 import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck
-import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
-import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
 
 class MqClient(val login: MqLogin) {
 
     // ---------------------------------------------------------------------------------------------
     // MQTT CLIENT OBJECTS
-
-    // MQTT 3 client
-    private var client3: Mqtt3AsyncClient = MqttClient.builder()
-        .useMqttVersion3()
-        .identifier(UUID.randomUUID().toString())
-        .serverHost(login.host)
-        .serverPort(login.port)
-        .sslWithDefaultConfig()
-        .buildAsync()
-
-    // MQTT 5 client
-    private var client5: Mqtt5AsyncClient = MqttClient.builder()
-        .useMqttVersion5()
-        .identifier(UUID.randomUUID().toString())
-        .serverHost(login.host)
-        .serverPort(login.port)
-        .sslWithDefaultConfig()
-        .buildAsync()
 
     // Blocking MQTT 3 client
     private var client3Blocking = MqttClient.builder()
@@ -89,34 +58,112 @@ class MqClient(val login: MqLogin) {
      * I used the blocking connect methods in order to force the logic to flow linearly, so that
      * I could track the connection status and update the UI accordingly in the view model. To
      * prevent these blocking methods from halting the main application thread, I wrapped the call
-     * in a coroutine in the view model.
+     * in a coroutine in the view model that calls this method.
      */
     fun mqConnectBlocking(): Boolean {
-
-        println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
 
         val connAck5: Mqtt5ConnAck
         val connAck3: Mqtt3ConnAck
 
-        // Blocking connect throws an exception if the connection fails
-        try {
-            connAck5 = client5Blocking.connectWith()
-                .simpleAuth()
-                .username(login.user!!)
-                .password(login.pass!!.toByteArray())
-                .applySimpleAuth()
-                .send()
-        }
-        catch (e: Exception) {
-            println("Failed to connect using v5")
-            println("Exception caught when trying to connect:")
-            println(e.message)
+        // No authentication login (no username and password)
+        if (login.user == null) {
 
-            println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+            println("(BLOCKING) Attempting to connect with version 5 using no authentication")
 
-            // Try to connect with v3 if v5 fails
+            // Blocking connect throws an exception if the connection fails
             try {
-                connAck3 = client3Blocking.connectWith()
+                connAck5 = client5Blocking.connect()
+            }
+            catch (e: Exception) {
+                println("Failed to connect using v5 with no authentication")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("(BLOCKING) Attempting to connect with version 3 using no authentication")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connect()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3 with no authentication")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3, no authentication")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+
+            }
+
+            println("Successfully connected using version 5, no authentication")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // For username and no password
+        else if (!(login.user == null) && login.pass == null) {
+
+            println("(BLOCKING) Attempting to connect with version 5 using username and no password")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5Blocking.connectWith()
+                    .simpleAuth()
+                    .username(login.user!!)
+                    .applySimpleAuth()
+                    .send()
+            }
+            catch (e: Exception) {
+                println("Failed to connect using v5")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("(BLOCKING) Attempting to connect with version 3 using username and no password")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+            }
+
+            println("Successfully connected using version 5")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // Basic authentication login
+        else {
+
+            println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5Blocking.connectWith()
                     .simpleAuth()
                     .username(login.user!!)
                     .password(login.pass!!.toByteArray())
@@ -124,114 +171,44 @@ class MqClient(val login: MqLogin) {
                     .send()
             }
             catch (e: Exception) {
-
-                println("Failed to connect using v3")
+                println("Failed to connect using v5")
                 println("Exception caught when trying to connect:")
                 println(e.message)
 
-                println("Cannot connect to client.")
-                return false
+                println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .password(login.pass!!.toByteArray())
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
             }
 
-            println("Successfully connected using version 3")
-            println(connAck3)
-            mqVersion = "v3"
+            println("Successfully connected using version 5")
+            mqVersion = "v5"
+            println(connAck5)
             return true
-
         }
 
-        println("Successfully connected using version 5")
-        mqVersion = "v5"
-        println(connAck5)
-        return true
     }
-
-
-//    fun mqConnect() {
-//
-//        println("Attempting to connect with version 5 using basic authentication")
-//
-//        client5.connectWith()
-//            .simpleAuth()
-//            .username(login.user!!)
-//            .password(login.pass!!.toByteArray())
-//            .applySimpleAuth()
-//            .send()
-//            .whenCompleteAsync { _, throwable ->
-//                // For failure
-//                if (throwable != null) {
-//                    println("v5 connection failed")
-//
-//                    // Try to connect with v3 if v5 fails
-//                    mqConnect3()
-//                }
-//                // For success
-//                else {
-//                    println("Successfully connected with v5")
-//                    mqVersion = "v5"
-//                }
-//
-//            }
-//
-//        // FOR TESTING
-//        println("End of mqConnect()")
-//    }
-//
-//
-//    private fun mqConnect3() {
-//
-//        println("Got to mqConnect3()")
-//        println("Attempting to connect with version 3 using basic authentication")
-//
-//        client3.connectWith()
-//            .simpleAuth()
-//            .username(login.user!!)
-//            .password(login.pass!!.toByteArray())
-//            .applySimpleAuth()
-//            .send()
-//            .whenCompleteAsync { _, throwable ->
-//                // For failure
-//                if (throwable != null) {
-//                    println("v3 connection failed")
-//                    throw MqFailedConnection3Exception("")
-//                    mqVersion = "ERROR"
-//                }
-//                // For success
-//                else {
-//                    println("Successfully connected with v3")
-//                    mqVersion = "v3"
-//                }
-//
-//            }
-//
-//    }
-//
-//
-//    private fun mqConnect5() {
-//
-//        println("Got to mqConnect3()")
-//        println("Attempting to connect with version 5 using basic authentication...")
-//
-//        client5.connectWith()
-//            .simpleAuth()
-//            .username(login.user!!)
-//            .password(login.pass!!.toByteArray())
-//            .applySimpleAuth()
-//            .send()
-//            .whenCompleteAsync { _, throwable ->
-//                // For failure
-//                if (throwable != null) {
-//                    println("v5 connection failed")
-//                    throw MqFailedConnection5Exception("")
-//                }
-//                // For success
-//                else {
-//                    println("Successfully connected with v5")
-//                }
-//
-//            }
-//    }
-
 
 
     // ---------------------------------------------------------------------------------------------
@@ -288,73 +265,10 @@ class MqClient(val login: MqLogin) {
         }
     }
 
-
-//    fun mqPublish(topic: String, payload: ByteArray) {
-//
-//        // Call publish message version based on determined MQTT connection version
-//        when (mqVersion) {
-//            "v5"    -> mqPublish5(topic, payload)
-//            "v3"    -> mqPublish3(topic, payload)
-//            else    -> mqPublish5(topic, payload) // The publish method will print an error when not connected
-//        }
-//
-//    }
-//
-//
-//    private fun mqPublish3(topic: String, payload: ByteArray) {
-//        client3.publishWith()
-//            .topic(topic)
-//            .payload(payload)
-//            .qos(MqttQos.EXACTLY_ONCE)
-//            .send()
-//            .whenComplete { publish, throwable ->
-//                // For error
-//                if (throwable != null) {
-//                    println("Failed to send message")
-//                    println(throwable.message)
-//                }
-//                // For success
-//                else {
-//                    println("Message sent")
-//                }
-//            }
-//    }
-//
-//
-//    private fun mqPublish5(topic: String, payload: ByteArray) {
-//        client5.publishWith()
-//            .topic(topic)
-//            .payload(payload)
-//            .qos(MqttQos.EXACTLY_ONCE)
-//            .send()
-//            .whenComplete { publish, throwable ->
-//                // For error
-//                if (throwable != null) {
-//                    println("Failed to send message")
-//                    println(throwable.message)
-//                }
-//                // For success
-//                else {
-//                    println("Message sent")
-//                }
-//            }
-//    }
-
-
-    // ---------------------------------------------------------------------------------------------
-    // RECEIVE METHODS
-
-    // (This app does not currently need to receive messages from a broker)
-
-
     // ---------------------------------------------------------------------------------------------
     // DISCONNECT
 
-
     fun disconnectAll() {
-
-        client3.disconnect()
-        client5.disconnect()
 
         // Blocking clients throw an exception if a disconnect attempt is made when not connected
         try {
@@ -379,382 +293,7 @@ class MqClient(val login: MqLogin) {
 
     }
 
-
     // ---------------------------------------------------------------------------------------------
-    // TESTING
-
-    /**
-     * Connect to the broker using MQTT version 3.1.1
-     *
-     * Supports basic authentication
-     */
-    fun mqConnectAndSend3() {
-
-        // Check for basic authentication
-        if (login.user != null && login.pass != null) {
-            // Connect with basic authentication
-            client3.connectWith()
-                .simpleAuth()
-                .username(login.user!!)
-                .password(login.pass!!.toByteArray())
-                .applySimpleAuth()
-                .send()
-                .whenComplete({ connAck, throwable ->
-                    if (throwable != null) {
-                        // handle failure
-                        println("TEST - Failed to connect")
-                        println(throwable.message)
-                    } else {
-                        // setup subscribes or start publishing
-                        println("Successfully connected")
-
-                        // Send a single test message
-                        client3.publishWith()
-                            .topic("TEST")
-                            .payload("Message from mqClient3 with basic auth".toByteArray())
-                            .qos(MqttQos.EXACTLY_ONCE)
-                            .send()
-                            .whenCompleteAsync { publish, throwable ->
-                                if (throwable != null) {
-                                    println("Could not send message")
-                                    println(throwable.message)
-                                } else {
-                                    println("Sent message")
-                                }
-                            }
-
-
-                    }
-                })
-
-        }
-        else {
-            // Connect with no authentication
-            client3.connect()
-                .whenComplete({ connAck, throwable ->
-                    if (throwable != null) {
-                        // handle failure
-                        println("TEST - Failed to connect")
-                        println(throwable.message)
-                    } else {
-                        // setup subscribes or start publishing
-                        println("Successfully connected")
-
-                        // Send a single test message
-                        client3.publishWith()
-                            .topic("TEST")
-                            .payload("Message from mqClient3 with no auth".toByteArray())
-                            .qos(MqttQos.EXACTLY_ONCE)
-                            .send()
-                            .whenCompleteAsync { publish, throwable ->
-                                if (throwable != null) {
-                                    println("Could not send message")
-                                    println(throwable.message)
-                                } else {
-                                    println("Sent message")
-                                }
-                            }
-
-
-                    }
-                })
-
-        }
-
-    }
-
-
-    /**
-     * Publish a message to an MQTT 3.1.1 broker
-     */
-    fun mqPublish3(topic: String, payload: ByteArray?, qos: MqttQos) {
-
-        client3.publishWith()
-            .topic(topic)
-            .payload(payload)
-            .qos(qos)
-            .send()
-            .whenComplete { mqtt3Publish, throwable ->
-                if (throwable != null) {
-                    // Handle failure to publish
-                    println("Could not send message with topic: $topic")
-                    println(throwable.message)
-                }
-                else {
-                    // Handle successful publish
-                    println("Message sent with topic: $topic")
-                }
-            }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * FOR TESTING ONLY! *********************************************************************************************
-     * Remove these functions when finished
-     */
-
-
-
-
-
-    fun testConnect_04() {
-        // Attempt the basic auth method
-
-        // DOES NOT WORK
-        // Issue with introducing setBasicAuth()
-        /**
-         * Is the error occurring because I'm separating the dot notation
-         * blocks?
-         *
-         * Do all of the sub-functions in .connectWith() need to be together?
-         */
-
-        client3 = setBasicAuth(client3)
-
-        // Connect
-        client3.connectWith()
-            .send()
-            .whenComplete({ connAck, throwable ->
-                if (throwable != null) {
-                    // handle failure
-                    println("TEST - Failed to connect")
-                    println(throwable.message)
-                } else {
-                    // setup subscribes or start publishing
-                    println("Successfully connected")
-
-                    // Send a single test message
-                    client3.publishWith()
-                        .topic("TEST")
-                        .payload("Message from testConnect_04".toByteArray())
-                        .qos(MqttQos.EXACTLY_ONCE)
-                        .send()
-                        .whenCompleteAsync { publish, throwable ->
-                            if (throwable != null) {
-                                println("Could not send message")
-                                println(throwable.message)
-                            } else {
-                                println("Sent message")
-                            }
-                        }
-                }
-            })
-
-
-    }
-
-
-    fun testConnect_03(){
-        // Attempt use the variable login
-
-        // THIS WORKS!
-
-        client3.connectWith()
-            .simpleAuth()
-            .username(login.user!!)
-            .password(login.pass!!.toByteArray())
-            .applySimpleAuth()
-            .send()
-            .whenComplete({ connAck, throwable ->
-                if (throwable != null) {
-                    // handle failure
-                    println("TEST - Failed to connect")
-                    println(throwable.message)
-                } else {
-                    // setup subscribes or start publishing
-                    println("Successfully connected")
-
-                    // Send a single test message
-                    client3.publishWith()
-                        .topic("TEST")
-                        .payload("Message from testConnect_03".toByteArray())
-                        .qos(MqttQos.EXACTLY_ONCE)
-                        .send()
-                        .whenCompleteAsync { publish, throwable ->
-                            if (throwable != null) {
-                                println("Could not send message")
-                                println(throwable.message)
-                            } else {
-                                println("Sent message")
-                            }
-                        }
-                }
-            })
-    }
-
-    fun testConnect_02() {
-        // Same test as before, but with class client instead of method client
-
-        /**
-         *
-         * THIS WORKS
-         *
-         * So, the issue is not with the class' client.
-         */
-
-        client3.connectWith()
-            .simpleAuth()
-            .username("row64")
-            .password("temp7777".toByteArray())
-            .applySimpleAuth()
-            .send()
-            .whenComplete({ connAck, throwable ->
-                if (throwable != null) {
-                    // handle failure
-                    println("TEST - Failed to connect")
-                    println(throwable.message)
-                } else {
-                    // setup subscribes or start publishing
-                    println("Successfully connected")
-
-                    // Send a single test message
-                    client3.publishWith()
-                        .topic("TEST")
-                        .payload("Message from testConnect_02".toByteArray())
-                        .qos(MqttQos.EXACTLY_ONCE)
-                        .send()
-                        .whenCompleteAsync { publish, throwable ->
-                            if (throwable != null) {
-                                println("Could not send message")
-                                println(throwable.message)
-                            } else {
-                                println("Sent message")
-                            }
-                        }
-                }
-            })
-    }
-
-
-
-
-    fun testConnect_01() {
-
-        val client3TEST: Mqtt3AsyncClient = MqttClient.builder()
-            .useMqttVersion3()
-            .identifier("my-mqtt-client-id")
-            .serverHost("5ab2c7f979c54060853470b0b4318d98.s1.eu.hivemq.cloud")
-            .serverPort(8883)
-            .sslWithDefaultConfig()
-            .buildAsync()
-
-
-        // THIS WORKS!!
-        client3TEST.connectWith()
-            .simpleAuth()
-            .username("row64")
-            .password("temp7777".toByteArray())
-            .applySimpleAuth()
-            .send()
-            .whenComplete({ connAck, throwable ->
-                if (throwable != null) {
-                    // handle failure
-                    println("TEST - Failed to connect")
-                    println(throwable.message)
-                } else {
-                    // setup subscribes or start publishing
-                    println("Successfully connected")
-
-                    // Send a single test message
-                    client3TEST.publishWith()
-                        .topic("TEST")
-                        .payload("Message from testConnect_01".toByteArray())
-                        .qos(MqttQos.EXACTLY_ONCE)
-                        .send()
-                        .whenCompleteAsync { publish, throwable ->
-                            if (throwable != null) {
-                                println("Could not send message")
-                                println(throwable.message)
-                            } else {
-                                println("Sent message")
-                            }
-                        }
-                }
-            })
-
-    }
-
-
-// ********************************************************************
-
-
-
-
-
-    // ------------------------------------------------------------
-    // SUPPORTING METHODS
-    // THESE DO NOT WORK! DELETE THESE LATER*****************************************************
-
-
-    /**
-     * Establish a connection with the server using an MQTT 3 client
-     */
-    private fun doConnect(client: Mqtt3AsyncClient) {
-
-        // Prepare the connection for basic auth, if user/pass are present
-        setBasicAuth(client)
-
-        // Connect
-        client.connectWith()
-            .send()
-            .whenComplete { ack, throwable ->
-                if (throwable != null) {
-                    println("Failed to connect")
-                    println(throwable.message)
-                }
-                else {
-                    println("Successfully connected")
-                }
-            }
-
-    }
-
-
-    /**
-     * Establish a connection with the server using an MQTT 5 client
-     */
-    private fun doConnect(client: Mqtt5AsyncClient) {
-
-
-        println("mqConnect for client 5 is not yet implemented...")
-
-    }
-
-    /**
-     * Sets up the basic authentication for an MQTT 3 client.
-     * Basic authentication consists of a username and a password.
-     * Basic authentication is optional
-     */
-    private fun setBasicAuth(client: Mqtt3AsyncClient): Mqtt3AsyncClient {
-        if (login.user != null && login.pass != null) {
-            client.connectWith().simpleAuth()
-                .username(login.user!!)
-                .password(login.pass!!.toByteArray())
-                .applySimpleAuth()
-        }
-        return client
-    }
-
-
-    /**
-     * Override for an MQTT 5 client
-     */
-    private fun setBasicAuth(client: Mqtt5AsyncClient) {
-
-
-    }
-
-
 
 
 
