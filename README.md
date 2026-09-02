@@ -2,9 +2,9 @@
 
 
 
-![r64_mqtt_client_image](/home/row64/Downloads/r64_mqtt_client_image.png)
+<img width="593" height="515" alt="r64_mqtt_client_image" src="https://github.com/user-attachments/assets/211f90e9-150c-497d-bb81-c6210672a2c5" />
 
-
+<br><br>
 
 The Row64 Location Client for Android is an open-source Kotlin application that periodically queries the current location of an Android device and streams the coordinates to an MQTT broker.
 
