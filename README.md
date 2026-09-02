@@ -48,3 +48,13 @@ Location must be enabled on the hosting device. This application requires fine l
 
 In addition to granting fine location permission, the device must also have an Internet connection (Wi-Fi or cellular) to send MQTT messages to the receiving broker.
 
+
+
+## Basic Usage
+
+1. Ensure the host device has location services enabled and a connection to the Internet (Wi-Fi or cellular).
+2. Connect to an MQTT broker by navigating to the *Send* screen and providing the connection details. At a minimum, provide a valid host and port number. If your broker requires authentication, input the username and password as needed. Select the *Connect* button to attempt a connection. If needed, a connection attempt can be prematurely canceled by selecting the *Disconnect* button, which will become enabled after the *Connect* button has been selected.
+3. If a connection attempt is successful, the *Send location updates* button will become enabled. Simply select this button to begin sending periodic location updates to the connected MQTT broker.
+4. When running the application for the first time, the application will pause and ask the user for location permissions. Grant permission for exact location. If permissions are denied, or only approximate location is granted, the application will not work. If needed, users can manage and upgrade the application's permission level from the Android system settings.
+5. The application will send location updates indefinitely until the *Stop sending updates* button is selected or the application is closed. A user can stop sending location updates, while maintaining a connection to the broker, by selecting the *Stop sending updates* button. Alternatively, a user can simultaneously stop sending updates and disconnect from the broker by selecting the *Disconnect* button.
+
