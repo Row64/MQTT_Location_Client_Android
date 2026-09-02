@@ -93,35 +93,108 @@ class MqClient(val login: MqLogin) {
      */
     fun mqConnectBlocking(): Boolean {
 
-        // No authentication login (no username and password)
-
-
-        // Basic authentication login
-
-        println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
-
         val connAck5: Mqtt5ConnAck
         val connAck3: Mqtt3ConnAck
 
-        // Blocking connect throws an exception if the connection fails
-        try {
-            connAck5 = client5Blocking.connectWith()
-                .simpleAuth()
-                .username(login.user!!)
-                .password(login.pass!!.toByteArray())
-                .applySimpleAuth()
-                .send()
-        }
-        catch (e: Exception) {
-            println("Failed to connect using v5")
-            println("Exception caught when trying to connect:")
-            println(e.message)
+        // No authentication login (no username and password)
+        if (login.user == null || login.user == "") {
 
-            println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+            println("(BLOCKING) Attempting to connect with version 5 using no authentication")
 
-            // Try to connect with v3 if v5 fails
+            // Blocking connect throws an exception if the connection fails
             try {
-                connAck3 = client3Blocking.connectWith()
+                connAck5 = client5Blocking.connect()
+            }
+            catch (e: Exception) {
+                println("Failed to connect using v5 with no authentication")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("(BLOCKING) Attempting to connect with version 3 using no authentication")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connect()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3 with no authentication")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3, no authentication")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+
+            }
+
+            println("Successfully connected using version 5, no authentication")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // For username and no password
+        else if (!(login.user == null) && login.pass == null) {
+
+            println("(BLOCKING) Attempting to connect with version 5 using username and no password")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5Blocking.connectWith()
+                    .simpleAuth()
+                    .username(login.user!!)
+                    .applySimpleAuth()
+                    .send()
+            }
+            catch (e: Exception) {
+                println("Failed to connect using v5")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("(BLOCKING) Attempting to connect with version 3 using username and no password")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+            }
+
+            println("Successfully connected using version 5")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // Basic authentication login
+        else {
+
+            println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5Blocking.connectWith()
                     .simpleAuth()
                     .username(login.user!!)
                     .password(login.pass!!.toByteArray())
@@ -129,27 +202,52 @@ class MqClient(val login: MqLogin) {
                     .send()
             }
             catch (e: Exception) {
-
-                println("Failed to connect using v3")
+                println("Failed to connect using v5")
                 println("Exception caught when trying to connect:")
                 println(e.message)
 
-                println("Cannot connect to client.")
-                return false
+                println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3Blocking.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .password(login.pass!!.toByteArray())
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect using v3")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected using version 3")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
             }
 
-            println("Successfully connected using version 3")
-            println(connAck3)
-            mqVersion = "v3"
+            println("Successfully connected using version 5")
+            mqVersion = "v5"
+            println(connAck5)
             return true
-
         }
 
-        println("Successfully connected using version 5")
-        mqVersion = "v5"
-        println(connAck5)
-        return true
     }
+
+
+
+
+
+
+
+
 
 
 //    fun mqConnect() {

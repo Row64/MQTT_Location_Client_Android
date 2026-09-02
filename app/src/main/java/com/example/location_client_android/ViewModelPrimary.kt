@@ -133,6 +133,12 @@ class ViewModelPrimary : ViewModel() {
      */
     private fun setCredentials() {
 
+        // Ensure credentials are wiped from any previous sessions
+        mqLogin.host = ""
+        mqLogin.port = -1
+        mqLogin.user = null
+        mqLogin.pass = null
+
         // Check for required minimum credentials
         if (inputHost.value.equals(null)
             || inputPort.value.equals(null)
