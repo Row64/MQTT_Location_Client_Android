@@ -1,7 +1,6 @@
 package com.example.location_client_android
 
 import android.Manifest
-import android.R.attr.onClick
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
@@ -10,16 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -33,10 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -45,15 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -63,7 +49,7 @@ import com.google.android.gms.location.Priority
 import kotlin.getValue
 
 
-class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
+class LoginFragment : Fragment() {
 
     // ViewModel instance
     private val viewModel: ViewModelPrimary by activityViewModels()
@@ -118,12 +104,12 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                         locationResult ?: return
                         for (location in locationResult.locations) {
 
-                            // Do something with location data
+                            // Do something here with location data
 
                             // For testing
                             println("${location.latitude}, ${location.longitude}, ${location.time}")
 
-                            // Send data
+                            // Send data to MQTT broker
                             viewModel.sendMessage(
                                 "R64_LOCATION_UPDATE",
                                 "${location.latitude}, ${location.longitude}".toByteArray()
@@ -175,8 +161,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
     fun requestPermissions() {
 
         // Before you perform the actual permission request, check whether your app
-        // already has the permissions, and whether your app needs to show a permission
-        // rationale dialog. For more details, see Request permissions:
+        // already has the permissions:
         // https://developer.android.com/training/permissions/requesting#request-permission
         locationPermissionRequest.launch(
             arrayOf(
@@ -235,8 +220,6 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                         var statePort = rememberTextFieldState()
                         var stateUser = rememberTextFieldState()
                         var statePass = rememberTextFieldState()
-
-                        var stateStatus = rememberTextFieldState()
 
                         // Host field
                         OutlinedTextField(
@@ -322,7 +305,6 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
 
                                     // Disconnect from server or cancel connection attempt
                                     viewModel.disconnectFromBroker()
-
                                     viewModel.updateOutputMessage("Disconnected from server.")
 
                                     // Reset UI state
@@ -358,7 +340,6 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                             onClick = {
 
                                 viewModel.updateOutputMessage("Attempting to send location updates...")
-
                                 viewModel.toggleLocationBtnEnabled(false)
                                 viewModel.toggleLocationCancelBtnEnabled(true)
 
@@ -377,8 +358,7 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
                             onClick = {
 
                                 viewModel.updateOutputMessage("Location updates canceled.")
-
-                                println("Cancelled location updates")
+                                println("Canceled location updates")
 
                                 viewModel.toggleLocationBtnEnabled(true)
                                 viewModel.toggleLocationCancelBtnEnabled(false)
@@ -419,381 +399,15 @@ class LoginFragment : Fragment( /* R.layout.layout_fragment_login */ ) {
     }
 
 
-
-
-
 }
 
-
-//@Composable
-//fun ConnectScreen(viewModel: ViewModelPrimary) {
-//
-//    // Layout
-//    Column(
-//        modifier = Modifier
-//            .padding(48.dp)
-//            .fillMaxSize(),
-//        verticalArrangement = Arrangement.spacedBy(24.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//    ) {
-//
-//        // UI components
-//
-//
-//        Title()
-////        FieldHost()
-////        FieldPort()
-////        FieldUser()
-////        FieldPass()
-////        ButtonConnect( onClick = { println("Connect button clicked...") } )
-////        LoginComponents()
-//
-//
-//        // Login components
-//        var stateHost = rememberTextFieldState()
-//        var statePort = rememberTextFieldState()
-//        var stateUser = rememberTextFieldState()
-//        var statePass = rememberTextFieldState()
-//
-//
-//        // Host field
-//        OutlinedTextField(
-//            state = stateHost,
-//            label = { Text("Host") },
-//            lineLimits = TextFieldLineLimits.SingleLine,
-//            keyboardOptions = KeyboardOptions(
-//                capitalization = KeyboardCapitalization.None,
-//                autoCorrectEnabled = false
-//            ),
-//            isError = viewModel.loginFieldError,
-//            enabled = viewModel.loginFieldEnabled
-//        )
-//
-//
-//        // Port field
-//        OutlinedTextField(
-//            state = statePort,
-//            label = { Text("Port") },
-//            inputTransformation = InputTransformation.maxLength(5),
-//            lineLimits = TextFieldLineLimits.SingleLine,
-//            keyboardOptions = KeyboardOptions(
-//                capitalization = KeyboardCapitalization.None,
-//                autoCorrectEnabled = false,
-//                keyboardType = KeyboardType.Number
-//            ),
-//            isError = viewModel.loginFieldError,
-//            enabled = viewModel.loginFieldEnabled
-//        )
-//
-//
-//        // Username field
-//        OutlinedTextField(
-//            state = stateUser,
-//            label = { Text("User") },
-//            lineLimits = TextFieldLineLimits.SingleLine,
-//            keyboardOptions = KeyboardOptions(
-//                capitalization = KeyboardCapitalization.None,
-//                autoCorrectEnabled = false
-//            ),
-//            enabled = viewModel.loginFieldEnabled
-//        )
-//
-//
-//        // Password field
-//        OutlinedSecureTextField(
-//            state = statePass,
-//            label = { Text("Password") },
-//            keyboardOptions = KeyboardOptions(
-//                capitalization = KeyboardCapitalization.None,
-//                autoCorrectEnabled = false
-//            ),
-//            enabled = viewModel.loginFieldEnabled
-//        )
-//
-//
-//        // Buttons
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.spacedBy(16.dp)
-//        ) {
-//
-//            // Connect button
-//            Button(
-//                onClick = {
-//
-//                    // FOR TESTING ONLY!
-//                    println("RAW --------------------" +
-//                            "\nHost: ${stateHost.text}" +
-//                            "\nPort: ${statePort.text}" +
-//                            "\nUser: ${stateUser.text}" +
-//                            "\nPass: ${statePass.text}")
-//
-//                    // Send login data to the view model
-//                    viewModel.inputHost.value = stateHost.text.toString()
-//                    viewModel.inputPort.value = statePort.text.toString()
-//                    viewModel.inputUser.value = stateUser.text.toString()
-//                    viewModel.inputPass.value = statePass.text.toString()
-//
-//                    // Attempt the connection to the MQTT broker
-//                    // Also completes a basic input validation check
-//                    viewModel.tryConnect()
-//
-//                },
-//                enabled = viewModel.connectBtnEnabled,
-////                modifier = Modifier.size(width = 80.dp, height = 20.dp)
-//            )
-//            {
-//                Text(text = stringResource(R.string.connect_btn_connect))
-//            }
-//
-//
-//            // Disconnect button
-//            FilledTonalButton (
-//                onClick = {
-//
-//                    // Disconnect from server or cancel connection attempt
-//                    viewModel.disconnectFromBroker()
-//
-//                    // Reset UI state
-//                    viewModel.toggleConnectBtn(true)
-//                    viewModel.toggleLoginFieldEnabled(true)
-//                    viewModel.toggleDisconnectBtn(false)
-//
-//                },
-//                enabled = viewModel.disconnectBtnEnabled
-//            )
-//            {
-//                Text(text = stringResource(R.string.disconnect_btn_cancel))
-//            }
-//
-//
-//
-//        }
-
-
-
-
-        // Connection status
-        /**
-         * This should indicate to the user if the connection attempt was successful or not,
-         * and print any returned MQTT connection issues.
-         *
-         * Consider placing in a text box. The text box should be centered, but the text within
-         * the box should be left-aligned
-         */
-//        Text(
-//            text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
-//        )
-
-        // Test send message
-        // FOR TESTING
-//        Button(
-//            onClick = {
-//
-//                // FOR TESTING
-//                viewModel.sendTestMessage()
-//            }
-//        ) {
-//            Text("Send location updates")
-//        }
-
-//
-//    }
-//}
 
 @Composable
 fun Title() {
     Text(
         text = stringResource(R.string.login_screen_title),
-//        fontSize = 28.sp,
         style = MaterialTheme.typography.headlineMedium,
         modifier = Modifier.padding(bottom = 10.dp)
     )
 }
-
-/**
- * Pass the ViewModel into the composable.
- * https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state
- *
- * The ViewModel is not declared anywhere else; just present here as this parameter
- */
-//@Composable
-//fun LoginComponents(viewModel: ViewModelPrimary = viewModel()) {
-//
-//    // Login container variables
-//    // For testing - might need to input into a ViewModel (?)
-//    var stateHost = rememberTextFieldState()
-//    var statePort = rememberTextFieldState()
-//    var stateUser = rememberTextFieldState()
-//    var statePass = rememberTextFieldState()
-//
-//
-//    // Host field
-//    OutlinedTextField(
-//        state = stateHost,
-//        label = { Text("Host") },
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//
-//
-//    // Port field
-//    OutlinedTextField(
-//        state = statePort,
-//        label = { Text("Port") },
-//        inputTransformation = InputTransformation.maxLength(5),
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false,
-//            keyboardType = KeyboardType.Number
-//        )
-//    )
-//
-//
-//    // Username field
-//    OutlinedTextField(
-//        state = stateUser,
-//        label = { Text("User") },
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//
-//
-//    // Password field
-//    OutlinedSecureTextField(
-//        state = statePass,
-//        label = { Text("Password") },
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//
-//
-//    // Connect button
-//    Button(
-//        onClick = {
-//            // FOR TESTING ONLY!
-//            println("RAW --------------------" +
-//                    "\nHost: ${stateHost.text}" +
-//                    "\nPort: ${statePort.text}" +
-//                    "\nUser: ${stateUser.text}" +
-//                    "\nPass: ${statePass.text}")
-//
-//            // FOR TESTING
-//            println("Before assignment:")
-//            viewModel.print()
-////            viewModel.mqHost = stateHost.text.toString()
-//            viewModel.mqHost.value = stateHost.text.toString()
-//            println("After assignment:")
-//            viewModel.print()
-//
-//
-//        } )
-//    {
-//        Text(text = stringResource(R.string.connect_btn_connect))
-//    }
-//
-//
-//    // Connection status
-//    /**
-//     * This should indicate to the user if the connection attempt was successful or not,
-//     * and print any returned MQTT connection issues.
-//     *
-//     * Consider placing in a text box. The text box should be centered, but the text within
-//     * the box should be left-aligned
-//     */
-//    Text(
-//        text = "CONNECTION ATTEMPT STATUS PLACEHOLDER..."
-//    )
-//
-//
-//
-//
-//}
-
-
-
-
-
-
-
-
-
-
-
-//@Composable
-//fun ButtonConnect( onClick: () -> Unit) {
-//    Button(
-//        onClick = {
-//            onClick()
-//        } )
-//    {
-//        Text(text = stringResource(R.string.connect_btn_connect))
-//    }
-//}
-//
-//@Composable
-//fun FieldHost() {
-//
-////    val hostState = rememberTextFieldState()
-//
-//    OutlinedTextField(
-////        state = hostState,
-//        state = rememberTextFieldState(),
-//        label = { Text("Host") },
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//}
-//
-//@Composable
-//fun FieldPort() {
-//    OutlinedTextField(
-//        state = rememberTextFieldState(),
-//        label = { Text("Port") },
-//        inputTransformation = InputTransformation.maxLength(5),
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false,
-//            keyboardType = KeyboardType.Number
-//        )
-//    )
-//}
-//
-//@Composable
-//fun FieldUser() {
-//    OutlinedTextField(
-//        state = rememberTextFieldState(),
-//        label = { Text("User") },
-//        lineLimits = TextFieldLineLimits.SingleLine,
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//}
-//
-//@Composable
-//fun FieldPass() {
-//    OutlinedSecureTextField(
-//        state = rememberTextFieldState(),
-//        label = { Text("Password") },
-//        keyboardOptions = KeyboardOptions(
-//            capitalization = KeyboardCapitalization.None,
-//            autoCorrectEnabled = false
-//        )
-//    )
-//}
 

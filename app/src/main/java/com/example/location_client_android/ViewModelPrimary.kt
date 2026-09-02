@@ -8,21 +8,8 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.Async
 
 class ViewModelPrimary : ViewModel() {
-
-    /**
-     * StateFlow with custom getters.
-     * https://developer.android.com/codelabs/basic-android-kotlin-compose-viewmodel-and-state
-     *
-     * Made private to ensure that states are not modified by external classes.
-     */
-//    private val _uiStateLogin = MutableStateFlow(LoginFragment())
-//    val uiStateLogin: StateFlow<LoginFragment> = _uiStateLogin.asStateFlow()
-//    private val _uiStateLocation = MutableStateFlow(LocationFragment())
-//    val uiStateLocation: StateFlow<LocationFragment> = _uiStateLocation.asStateFlow()
-
 
     // Compose UI variables
     var connectBtnEnabled by mutableStateOf(true)
@@ -68,7 +55,6 @@ class ViewModelPrimary : ViewModel() {
 
         try {
 
-            // TESTING
             outputMessage = "Attempting to connect..."
 
             // Basic input validation and assign user input to MqLogin object
@@ -108,12 +94,10 @@ class ViewModelPrimary : ViewModel() {
                 else {
                     // Enable send location button on successful connection
                     locationBtnEnabled = true
-
                     outputMessage = "Successfully connected! You may now send location updates."
                 }
 
                 println("Reached end of coroutine")
-
             }
 
         }
@@ -124,7 +108,6 @@ class ViewModelPrimary : ViewModel() {
 
             println(e.message)
             loginFieldError = true
-
         }
     }
 
@@ -273,7 +256,6 @@ class ViewModelPrimary : ViewModel() {
     }
 
     // ---------------------------------------------------------------------------------------------
-
 
 
 }
