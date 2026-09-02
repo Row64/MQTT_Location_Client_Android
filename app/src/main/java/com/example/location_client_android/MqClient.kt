@@ -93,6 +93,11 @@ class MqClient(val login: MqLogin) {
      */
     fun mqConnectBlocking(): Boolean {
 
+        // No authentication login (no username and password)
+
+
+        // Basic authentication login
+
         println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
 
         val connAck5: Mqtt5ConnAck

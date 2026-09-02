@@ -178,20 +178,22 @@ class ViewModelPrimary : ViewModel() {
             mqLogin.port = portInt
 
             // Assign additional inputs to the MqLogin object, if present.
-            // Username and password are only assigned if they are both present.
+            // Username can be supplied without a password.
+            // Only assign password if additionally supplied with a username.
             if (!(inputUser.value.equals(null)
-                || inputPass.value.equals(null)
-                || inputUser.value.equals("")
-                || inputPass.value.equals("")))
+                || inputUser.value.equals("")))
             {
                 mqLogin.user = inputUser.value
-                mqLogin.pass = inputPass.value
+
+                // Assign password if username is present
+                if (!(inputPass.value.equals(null)
+                    || inputPass.value.equals("")))
+                {
+                    mqLogin.pass = inputPass.value
+                }
             }
 
-
         }
-
-
     }
 
 
