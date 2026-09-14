@@ -30,15 +30,15 @@ This application can connect to a broker using either version 5 or 3.1.1. When a
 
 
 
-## Authentication Options
+## Connection and Authentication Options
 
-The client permits flexible username and password authentication combinations. Currently, the following options are supported:
+To connect to an MQTT broker, users must provide a valid host and port, in addition to a username and password if their broker requires authentication. The client permits flexible username and password authentication combinations. Currently, the following options are supported:
 
 * No authentication (anonymous authentication)
 * Username-only authentication
 * Basic authentication (username and password)
 
-To connect to an MQTT broker, users must provide a valid host and port, with the port number being a positive integer within the range of 1 through 65,535.
+*Users must currently connect over port 8883 (MQTT over TLS/SSL). At this time, using other ports may result in a connection failure.*
 
 
 
