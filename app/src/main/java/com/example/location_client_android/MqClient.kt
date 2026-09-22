@@ -260,18 +260,18 @@ class MqClient(val login: MqLogin) {
         // No authentication login (no username and password)
         if (login.user == null) {
 
-            println("(BLOCKING) Attempting to connect with version 5 using no authentication")
+            println("Attempting to connect. MQTT = v5, Auth = none, SSL = FALSE")
 
             // Blocking connect throws an exception if the connection fails
             try {
                 connAck5 = client5Blocking.connect()
             }
             catch (e: Exception) {
-                println("Failed to connect using v5 with no authentication")
+                println("Failed to connect. MQTT = v5, Auth = none, SSL = FALSE")
                 println("Exception caught when trying to connect:")
                 println(e.message)
 
-                println("(BLOCKING) Attempting to connect with version 3 using no authentication")
+                println("Attempting to connect. MQTT = v3.1.1, Auth = none, SSL = FALSE")
 
                 // Try to connect with v3 if v5 fails
                 try {
@@ -279,7 +279,7 @@ class MqClient(val login: MqLogin) {
                 }
                 catch (e: Exception) {
 
-                    println("Failed to connect using v3 with no authentication")
+                    println("Failed to connect. MQTT = v3.1.1, Auth = none, SSL = FALSE")
                     println("Exception caught when trying to connect:")
                     println(e.message)
 
@@ -287,14 +287,14 @@ class MqClient(val login: MqLogin) {
                     return false
                 }
 
-                println("Successfully connected using version 3, no authentication")
+                println("Successfully connected. MQTT = v3.1.1, Auth = none, SSL = FALSE.")
                 println(connAck3)
                 mqVersion = "v3"
                 return true
 
             }
 
-            println("Successfully connected using version 5, no authentication")
+            println("Successfully connected. MQTT = v5, Auth = none, SSL = FALSE.")
             mqVersion = "v5"
             println(connAck5)
             return true
@@ -302,7 +302,7 @@ class MqClient(val login: MqLogin) {
         // For username and no password
         else if (!(login.user == null) && login.pass == null) {
 
-            println("(BLOCKING) Attempting to connect with version 5 using username and no password")
+            println("Attempting to connect. MQTT = v5, Auth = Username, SSL = FALSE")
 
             // Blocking connect throws an exception if the connection fails
             try {
@@ -313,11 +313,11 @@ class MqClient(val login: MqLogin) {
                     .send()
             }
             catch (e: Exception) {
-                println("Failed to connect using v5")
+                println("Failed to connect. MQTT = v5, Auth = Username, SSL = FALSE")
                 println("Exception caught when trying to connect:")
                 println(e.message)
 
-                println("(BLOCKING) Attempting to connect with version 3 using username and no password")
+                println("Attempting to connect. MQTT = v3.1.1, Auth = Username, SSL = FALSE")
 
                 // Try to connect with v3 if v5 fails
                 try {
@@ -329,7 +329,7 @@ class MqClient(val login: MqLogin) {
                 }
                 catch (e: Exception) {
 
-                    println("Failed to connect using v3")
+                    println("Failed to connect. MQTT = v3.1.1, Auth = Username, SSL = FALSE")
                     println("Exception caught when trying to connect:")
                     println(e.message)
 
@@ -337,13 +337,13 @@ class MqClient(val login: MqLogin) {
                     return false
                 }
 
-                println("Successfully connected using version 3")
+                println("Successfully connected. MQTT = v3.1.1, Auth = Username, SSL = FALSE")
                 println(connAck3)
                 mqVersion = "v3"
                 return true
             }
 
-            println("Successfully connected using version 5")
+            println("Successfully connected. MQTT = v5, Auth = Username, SSL = FALSE")
             mqVersion = "v5"
             println(connAck5)
             return true
@@ -351,7 +351,7 @@ class MqClient(val login: MqLogin) {
         // Basic authentication login
         else {
 
-            println("(BLOCKING) Attempting to connect with version 5 using basic authentication")
+            println("Attempting to connect. MQTT = v5, Auth = Basic, SSL = FALSE")
 
             // Blocking connect throws an exception if the connection fails
             try {
@@ -363,11 +363,11 @@ class MqClient(val login: MqLogin) {
                     .send()
             }
             catch (e: Exception) {
-                println("Failed to connect using v5")
+                println("Failed to connect. MQTT = v5, Auth = Basic, SSL = FALSE")
                 println("Exception caught when trying to connect:")
                 println(e.message)
 
-                println("(BLOCKING) Attempting to connect with version 3 using basic authentication")
+                println("Attempting to connect. MQTT = v3.1.1, Auth = Basic, SSL = FALSE")
 
                 // Try to connect with v3 if v5 fails
                 try {
@@ -380,7 +380,7 @@ class MqClient(val login: MqLogin) {
                 }
                 catch (e: Exception) {
 
-                    println("Failed to connect using v3")
+                    println("Failed to connect. MQTT = v3.1.1, Auth = Basic, SSL = FALSE")
                     println("Exception caught when trying to connect:")
                     println(e.message)
 
@@ -388,13 +388,13 @@ class MqClient(val login: MqLogin) {
                     return false
                 }
 
-                println("Successfully connected using version 3")
+                println("Successfully connected. MQTT = v3.1.1, Auth = Basic, SSL = FALSE")
                 println(connAck3)
                 mqVersion = "v3"
                 return true
             }
 
-            println("Successfully connected using version 5")
+            println("Successfully connected. MQTT = v5, Auth = Basic, SSL = FALSE")
             mqVersion = "v5"
             println(connAck5)
             return true
