@@ -133,13 +133,13 @@ class MqClient(val login: MqLogin) {
 
                 println("Successfully connected. MQTT = v3.1.1, Auth = none, SSL = TRUE")
                 println(connAck3)
-                mqVersion = "v3"
+                mqVersion = "v3SSL"
                 return true
 
             }
 
             println("Successfully connected. MQTT = v5, Auth = none, SSL = TRUE")
-            mqVersion = "v5"
+            mqVersion = "v5SSL"
             println(connAck5)
             return true
         }
@@ -183,12 +183,12 @@ class MqClient(val login: MqLogin) {
 
                 println("Successfully connected. MQTT = v3.1.1, Auth = Username, SSL = TRUE")
                 println(connAck3)
-                mqVersion = "v3"
+                mqVersion = "v3SSL"
                 return true
             }
 
             println("Successfully connected. MQTT = v5, Auth = Username, SSL = TRUE")
-            mqVersion = "v5"
+            mqVersion = "v5SSL"
             println(connAck5)
             return true
         }
@@ -234,12 +234,12 @@ class MqClient(val login: MqLogin) {
 
                 println("Successfully connected. MQTT = v3.1.1, Auth = Basic, SSL = TRUE")
                 println(connAck3)
-                mqVersion = "v3"
+                mqVersion = "v3SSL"
                 return true
             }
 
-            println("Successfully connected using. MQTT = v5, Auth = Basic, SSL = TRUE")
-            mqVersion = "v5"
+            println("Successfully connected. MQTT = v5, Auth = Basic, SSL = TRUE")
+            mqVersion = "v5SSL"
             println(connAck5)
             return true
         }
@@ -419,7 +419,44 @@ class MqClient(val login: MqLogin) {
         when (mqVersion) {
             "v5"    -> mqPublish5Blocking(topic, payload)
             "v3"    -> mqPublish3Blocking(topic, payload)
-            else    -> mqPublish5Blocking(topic, payload) // The publish method will print an error when not connected
+            "v5SSL" -> mqPublish5BlockingSSL(topic, payload)
+            "v3SSL" -> mqPublish3BlockingSSL(topic, payload)
+            else    -> print("Failed to identify connected MQTT version. Could not send message.")
+//            else    -> mqPublish5Blocking(topic, payload) // The publish method will print an error when not connected
+        }
+    }
+
+    // Send a message using MQTT 3.1.1 and SSL
+    private fun mqPublish3BlockingSSL(topic: String, payload: ByteArray) {
+        try {
+            client3BlockingSSL.publishWith()
+                .topic(topic)
+                .payload(payload)
+                .qos(MqttQos.EXACTLY_ONCE)
+                .send()
+
+            println("Sent message with version 3.1.1 using SSL")
+        }
+        catch (e: Exception) {
+            println("Caught exception when trying to send message with version 3.1.1 using SSL")
+            println(e.message)
+        }
+    }
+
+    // Send a message using MQTT 5 and SSL
+    private fun mqPublish5BlockingSSL(topic: String, payload: ByteArray) {
+        try {
+            client5BlockingSSL.publishWith()
+                .topic(topic)
+                .payload(payload)
+                .qos(MqttQos.EXACTLY_ONCE)
+                .send()
+
+            println("Sent message with version 5 using SSL")
+        }
+        catch (e: Exception) {
+            println("Caught exception when trying to send message with version 5 using SSL")
+            println(e.message)
         }
     }
 
