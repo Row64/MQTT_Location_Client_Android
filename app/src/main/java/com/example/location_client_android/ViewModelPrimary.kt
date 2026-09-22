@@ -192,7 +192,7 @@ class ViewModelPrimary : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
-                mqClient.mqPublishBlocking(topic, payload)
+                mqClient.mqPublish(topic, payload)
             }
             catch (e: UninitializedPropertyAccessException) {
                 // For when a message is sent before the client object is initialized.

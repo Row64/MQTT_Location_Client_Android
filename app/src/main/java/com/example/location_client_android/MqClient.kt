@@ -413,7 +413,7 @@ class MqClient(val login: MqLogin) {
      * These publish methods are blocking, so they need to be encapsulated in a coroutine
      * in the view model, which calls them.
      */
-    fun mqPublishBlocking(topic: String, payload: ByteArray) {
+    fun mqPublish(topic: String, payload: ByteArray) {
 
         // Call publish method based on determined MQTT connection version
         when (mqVersion) {
