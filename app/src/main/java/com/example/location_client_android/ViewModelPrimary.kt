@@ -76,7 +76,7 @@ class ViewModelPrimary : ViewModel() {
             // to not freeze the application, but to allow a linear flow
             CoroutineScope(Dispatchers.IO).launch {
 
-                val connectionResult: Boolean = mqClient.mqConnectBlocking()
+                val connectionResult: Boolean = mqClient.mqConnect()
 
                 // Reset the UI if a connection attempt fails
                 if (!connectionResult) {

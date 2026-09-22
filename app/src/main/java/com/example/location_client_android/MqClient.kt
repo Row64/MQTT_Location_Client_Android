@@ -23,11 +23,27 @@ class MqClient(val login: MqLogin) {
         .identifier(UUID.randomUUID().toString())
         .serverHost(login.host)
         .serverPort(login.port)
-        .sslWithDefaultConfig()
         .buildBlocking()
 
     // Blocking MQTT 5 client
     private var client5Blocking = MqttClient.builder()
+        .useMqttVersion5()
+        .identifier(UUID.randomUUID().toString())
+        .serverHost(login.host)
+        .serverPort(login.port)
+        .buildBlocking()
+
+    // Blocking MQTT 3 client SSL/TLS
+    private var client3BlockingSSL = MqttClient.builder()
+        .useMqttVersion3()
+        .identifier(UUID.randomUUID().toString())
+        .serverHost(login.host)
+        .serverPort(login.port)
+        .sslWithDefaultConfig()
+        .buildBlocking()
+
+    // Blocking MQTT 5 client SSL/TLS
+    private var client5BlockingSSL = MqttClient.builder()
         .useMqttVersion5()
         .identifier(UUID.randomUUID().toString())
         .serverHost(login.host)
@@ -60,7 +76,183 @@ class MqClient(val login: MqLogin) {
      * prevent these blocking methods from halting the main application thread, I wrapped the call
      * in a coroutine in the view model that calls this method.
      */
-    fun mqConnectBlocking(): Boolean {
+
+    fun mqConnect(): Boolean {
+
+        var connectResult: Boolean
+
+        // Determine how to connect based on the port
+        when(login.port) {
+            8883 -> connectResult = mqConnectBlockingSSL()
+            1883 -> connectResult = mqConnectBlocking()
+            else -> connectResult = mqConnectBlocking()
+        }
+        return connectResult
+    }
+
+
+    // Connect using TLS/SSL
+    // Includes automatic MQTT version fallback
+    private fun mqConnectBlockingSSL(): Boolean {
+
+        // TESTING
+        println("Using SSL to connect...")
+
+        val connAck5: Mqtt5ConnAck
+        val connAck3: Mqtt3ConnAck
+
+        // No authentication login (no username and password)
+        if (login.user == null) {
+
+            println("Attempting to connect. MQTT = v5, Auth = none, SSL = TRUE")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5BlockingSSL.connect()
+            }
+            catch (e: Exception) {
+                println("Failed to connect. MQTT = v5, Auth = none, SSL = TRUE")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("Attempting to connect. MQTT = v3.1.1, Auth = none, SSL = TRUE")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3BlockingSSL.connect()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect. MQTT = v3.1.1, Auth = none, SSL = TRUE")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected. MQTT = v3.1.1, Auth = none, SSL = TRUE")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+
+            }
+
+            println("Successfully connected. MQTT = v5, Auth = none, SSL = TRUE")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // For username and no password
+        else if (!(login.user == null) && login.pass == null) {
+
+            println("Attempting to connect. MQTT = v5, Auth = Username, SSL = TRUE")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5BlockingSSL.connectWith()
+                    .simpleAuth()
+                    .username(login.user!!)
+                    .applySimpleAuth()
+                    .send()
+            }
+            catch (e: Exception) {
+                println("Failed to connect. MQTT = v5, Auth = Username, SSL = TRUE")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("Attempting to connect. MQTT = v3.1.1, Auth = Username, SSL = TRUE")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3BlockingSSL.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect. MQTT = v3.1.1, Auth = Username, SSL = TRUE")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected. MQTT = v3.1.1, Auth = Username, SSL = TRUE")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+            }
+
+            println("Successfully connected. MQTT = v5, Auth = Username, SSL = TRUE")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+        // Basic authentication login
+        else {
+
+            println("Attempting to connect. MQTT = v5, Auth = Basic, SSL = TRUE")
+
+            // Blocking connect throws an exception if the connection fails
+            try {
+                connAck5 = client5BlockingSSL.connectWith()
+                    .simpleAuth()
+                    .username(login.user!!)
+                    .password(login.pass!!.toByteArray())
+                    .applySimpleAuth()
+                    .send()
+            }
+            catch (e: Exception) {
+                println("Failed to connect. MQTT = v5, Auth = Basic, SSL = TRUE")
+                println("Exception caught when trying to connect:")
+                println(e.message)
+
+                println("Attempting to connect. MQTT = v3.1.1, Auth = Basic, SSL = TRUE")
+
+                // Try to connect with v3 if v5 fails
+                try {
+                    connAck3 = client3BlockingSSL.connectWith()
+                        .simpleAuth()
+                        .username(login.user!!)
+                        .password(login.pass!!.toByteArray())
+                        .applySimpleAuth()
+                        .send()
+                }
+                catch (e: Exception) {
+
+                    println("Failed to connect. MQTT = v3.1.1, Auth = Basic, SSL = TRUE")
+                    println("Exception caught when trying to connect:")
+                    println(e.message)
+
+                    println("Cannot connect to client.")
+                    return false
+                }
+
+                println("Successfully connected. MQTT = v3.1.1, Auth = Basic, SSL = TRUE")
+                println(connAck3)
+                mqVersion = "v3"
+                return true
+            }
+
+            println("Successfully connected using. MQTT = v5, Auth = Basic, SSL = TRUE")
+            mqVersion = "v5"
+            println(connAck5)
+            return true
+        }
+
+    }
+
+
+    // Connect with no encryption (such as for port 1883)
+    // Includes automatic MQTT version fallback
+    private fun mqConnectBlocking(): Boolean {
+
+        // TESTING
+        println("Not using SSL to connect...")
 
         val connAck5: Mqtt5ConnAck
         val connAck3: Mqtt3ConnAck
