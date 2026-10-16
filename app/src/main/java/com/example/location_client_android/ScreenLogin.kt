@@ -26,7 +26,10 @@ import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -64,7 +67,8 @@ fun LoginScreen(viewModel: ViewModelPrimary) {
 
     // Location callback
     // https://developer.android.com/develop/sensors-and-location/location/request-updates
-    lateinit var locationCallback: LocationCallback
+    //lateinit var locationCallback: LocationCallback
+    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
 
 
     /**
@@ -120,7 +124,7 @@ fun LoginScreen(viewModel: ViewModelPrimary) {
 
                 fusedLocationClient.requestLocationUpdates(
                     locationRequest,
-                    locationCallback,
+                    locationCallback!!,
                     Looper.getMainLooper()
                 )
 
@@ -286,7 +290,7 @@ fun LoginScreen(viewModel: ViewModelPrimary) {
 
                     // Removing callback throws exception if not client is not yet initialized
                     try {
-                        fusedLocationClient.removeLocationUpdates(locationCallback)
+                        fusedLocationClient.removeLocationUpdates(locationCallback!!)
                         viewModel.updateOutputMessage("Disconnected from broker and canceled location updates.")
                     }
                     // No need to do anything if exception is caught
@@ -331,7 +335,7 @@ fun LoginScreen(viewModel: ViewModelPrimary) {
                 viewModel.toggleLocationCancelBtnEnabled(false)
 
                 // Cancel the location updates
-                fusedLocationClient.removeLocationUpdates(locationCallback)
+                fusedLocationClient.removeLocationUpdates(locationCallback!!)
             },
             enabled = viewModel.locationCancelBtnEnabled,
         )
