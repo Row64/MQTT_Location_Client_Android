@@ -402,12 +402,12 @@ class LoginFragment : Fragment() {
 }
 
 
-@Composable
-fun Title() {
-    Text(
-        text = stringResource(R.string.login_screen_title),
-        style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.padding(bottom = 10.dp)
-    )
-}
+//@Composable
+//fun Title() {
+//    Text(
+//        text = stringResource(R.string.login_screen_title),
+//        style = MaterialTheme.typography.headlineMedium,
+//        modifier = Modifier.padding(bottom = 10.dp)
+//    )
+//}
 
